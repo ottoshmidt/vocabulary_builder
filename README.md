@@ -4,7 +4,7 @@ This is a tool to build your vocabulary of foreign words. It allows word lookup 
 
 To build this project you need Qt5 library, including Qt Webkit:
 
-cd ./src
-qmake CONFIG-=debug CONFIG+=release 
+cd ./src  
+qmake CONFIG-=debug CONFIG+=release  
 make
 
