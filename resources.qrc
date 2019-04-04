@@ -1,0 +1,14 @@
+<RCC>
+    <qresource prefix="/">
+        <file>icons/blank.ico</file>
+        <file>icons/books.ico</file>
+        <file>icons/delete.ico</file>
+        <file>icons/exit.ico</file>
+        <file>icons/filter.ico</file>
+        <file>icons/new.ico</file>
+        <file>icons/settings.ico</file>
+        <file>icons/settings1.ico</file>
+        <file>icons/goto.ico</file>
+        <file>icons/refresh.ico</file>
+    </qresource>
+</RCC>
