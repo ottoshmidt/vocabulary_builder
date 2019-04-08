@@ -8,17 +8,15 @@
 #include <QStatusBar>
 
 
-//TODO: when deleting "don't ask again" checkbox, in settings as well
-
 //TODO: Docker widget and resizable views
-//TODO: check if we can set mastered checkbox in the middle automatically
 //TODO: Possibility change website order
 //TODO: Reflect website modifications in already loaded programme
 //TODO: About window
 //TODO: pdf and csv exports
 //TODO: Delete word on right-click
-//TODO: Add multiple language dictionaries
+//TODO: check if we can set mastered checkbox in the middle automatically
 //TODO: Translations geo,rus
+//TODO: Add multiple language dictionaries
 
 bool showStatusBar;
 bool confirmDelete;
@@ -41,6 +39,7 @@ void MainWindow::setupDialogs()
   dialogfilterWord = new DialogFilter(this);
   dialogSettings = new DialogSettings(this);
   dialogGotoWord = new DialogGotoWord(this);
+  dialogConfirmDelete = new DialogConfirmDelete(this);
 
   connect(dialogAddWord, &DialogAddWord::linkClicked, dialogGotoWord,
           &DialogGotoWord::gotoWord);
@@ -78,14 +77,14 @@ void MainWindow::setupCentralGrid()
 {
   setWindowIcon(QIcon(":icons/books.ico"));
 
-  centreWidget.setLayout(&centralGrid);
+  centreWidget.setLayout(&glCentralGrid);
 
   centralScroll.setWidget(&centreWidget);
   centralScroll.setWidgetResizable(true);
 
   setCentralWidget(&centralScroll);
 
-  centralGrid.addWidget(tableWords, 0, 0, 1, 2);
+  glCentralGrid.addWidget(tableWords, 0, 0, 1, 2);
 
   QSqlQuery query(DataBase::getDb());
 
@@ -104,7 +103,7 @@ void MainWindow::setupCentralGrid()
 
     webView->setMinimumHeight(550);
 
-    centralGrid.addWidget(webView, row, col);
+    glCentralGrid.addWidget(webView, row, col);
 
     webViewList.append(webView);
 
@@ -227,7 +226,7 @@ void MainWindow::setupMenus()
   actionDeleteEntry.setShortcut(QKeySequence::Delete);
   actionDeleteEntry.setIcon(QIcon(":/icons/delete.ico"));
   actionDeleteEntry.setEnabled(false);
-  connect(&actionDeleteEntry, &QAction::triggered, this, &MainWindow::deleteEntry);
+  connect(&actionDeleteEntry, &QAction::triggered, this, &MainWindow::confirmDeleteEntry);
   menuWords.addAction(&actionDeleteEntry);
 
   menuBar()->addMenu(&menuWords);
@@ -368,20 +367,34 @@ void MainWindow::applyFilter()
   modelWords->setFilter(filterStr);
 }
 
-void MainWindow::deleteEntry()
+void MainWindow::confirmDeleteEntry()
 {
   int r = tableWords->currentIndex().row();
   QModelIndex i = modelWords->index(r, 1);
   QString word = modelWords->data(i).toString();
 
-  if(QMessageBox::question(this, "Delete Record", "Are you sure you want "
-                           "to delete '" + word + "'?") == QMessageBox::Yes)
+  if(confirmDelete)
   {
-    modelWords->removeRow(r);
-    modelWords->select();
+    dialogConfirmDelete->setWord(word);
 
-    updateWordCount();
+    if(dialogConfirmDelete->exec())
+    {
+      deleteEntry(r);
+    }
   }
+  else
+  {
+    deleteEntry(r);
+  }
+}
+
+void MainWindow::deleteEntry(int row)
+{
+  modelWords->removeRow(row);
+  modelWords->select();
+
+  if(statusBar()->isVisible())
+    updateWordCount();
 }
 
 void MainWindow::updateWordCount()

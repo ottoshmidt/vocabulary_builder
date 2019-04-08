@@ -35,7 +35,8 @@ SOURCES += \
     dialoggotoword.cpp \
     dialogaddword.cpp \
     dialogsettings.cpp \
-    dialogfilter.cpp
+    dialogfilter.cpp \
+    dialogconfirmdelete.cpp
 
 HEADERS += \
         mainwindow.h \
@@ -47,7 +48,8 @@ HEADERS += \
     dialoggotoword.h \
     dialogaddword.h \
     dialogsettings.h \
-    dialogfilter.h
+    dialogfilter.h \
+    dialogconfirmdelete.h
 
 FORMS +=
 

@@ -8,8 +8,8 @@
 DialogFilter::DialogFilter(QWidget *parent)
 {
   setParent(parent);
-  setWindowFlags(Qt::Dialog);
   setWindowTitle(tr("Filter Records"));
+  setWindowFlags(Qt::Dialog);
   setMinimumSize(340, 130);
 
   setupWidgets();

@@ -6,6 +6,7 @@
 #include "dialogfilter.h"
 #include "dialogsettings.h"
 #include "dialoggotoword.h"
+#include "dialogconfirmdelete.h"
 
 #include <QMainWindow>
 #include <QWebEngineView>
@@ -63,7 +64,7 @@ private:
 
   QScrollArea centralScroll;
   QWidget centreWidget;
-  QGridLayout centralGrid;
+  QGridLayout glCentralGrid;
 
   ModelView modelView;
   CustomModel *modelWords;
@@ -73,6 +74,7 @@ private:
   DialogFilter *dialogfilterWord;
   DialogSettings *dialogSettings;
   DialogGotoWord *dialogGotoWord;
+  DialogConfirmDelete *dialogConfirmDelete;
 
   QStatusBar *statBar;
   QLabel lbStatBar;
@@ -98,7 +100,8 @@ private slots:
   void onDefinedToggle(const bool &b);
   void onUndefinedToggle(const bool &b);
   void applyFilter();
-  void deleteEntry();
+  void confirmDeleteEntry();
+  void deleteEntry(int row);
   void updateWordCount();
   void onBeforeUpdate(int row, QSqlRecord &record);
   void toggleConfirmDelete(bool ok);

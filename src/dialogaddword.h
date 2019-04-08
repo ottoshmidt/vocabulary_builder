@@ -13,7 +13,7 @@ class DialogAddWord : public QDialog
   Q_OBJECT
 
 public:
-  explicit DialogAddWord(QWidget *parent = nullptr);
+  DialogAddWord(QWidget *parent = nullptr);
 
 private:
   QLineEdit leWord;

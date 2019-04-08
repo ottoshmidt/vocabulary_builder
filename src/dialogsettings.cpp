@@ -143,6 +143,15 @@ void DialogSettings::setupView()
   tableWebsites->resizeRowsToContents();
 }
 
+void DialogSettings::showEvent(QShowEvent *event)
+{
+  extern bool confirmDelete;
+
+  cbConfirmDelete.setChecked(confirmDelete);
+
+  event->accept();
+}
+
 void DialogSettings::onSettingsRowChange(int row)
 {
   switch(row)

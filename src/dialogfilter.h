@@ -11,7 +11,7 @@
 class DialogFilter : public QDialog
 {
 public:
-  explicit DialogFilter(QWidget *parent = nullptr);
+  DialogFilter(QWidget *parent = nullptr);
 
 private:
   QLineEdit leFilterWord;
