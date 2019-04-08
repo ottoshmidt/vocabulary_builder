@@ -8,15 +8,14 @@
 #include <QStatusBar>
 
 
-//TODO: Docker widget and resizable views
 //TODO: Possibility change website order
 //TODO: Reflect website modifications in already loaded programme
+//TODO: Add multiple language dictionaries
 //TODO: About window
 //TODO: pdf and csv exports
 //TODO: Delete word on right-click
 //TODO: check if we can set mastered checkbox in the middle automatically
 //TODO: Translations geo,rus
-//TODO: Add multiple language dictionaries
 
 bool showStatusBar;
 bool confirmDelete;
@@ -24,6 +23,8 @@ bool confirmDelete;
 MainWindow::MainWindow(QWidget *parent) :
   QMainWindow(parent)
 {
+  setWindowIcon(QIcon(":icons/books.ico"));
+
   setupDialogs();
 
   setupModelView();
@@ -75,8 +76,6 @@ void MainWindow::setupModelView()
 
 void MainWindow::setupCentralGrid()
 {
-  setWindowIcon(QIcon(":icons/books.ico"));
-
   centreWidget.setLayout(&glCentralGrid);
 
   centralScroll.setWidget(&centreWidget);
@@ -252,7 +251,7 @@ void MainWindow::resizeEvent(QResizeEvent *event)
 {
   QMainWindow::resizeEvent(event);
 
-  double height = static_cast<double>(this->height()) * 0.42;
+  double height = static_cast<double>(this->height()) * 0.46;
 
   tableWords->setMinimumHeight(static_cast<int>(height));
 

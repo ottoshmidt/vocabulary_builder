@@ -21,6 +21,8 @@
 #include <QCheckBox>
 #include <QThread>
 #include <QStatusBar>
+#include <QDockWidget>
+
 
 class WordCount : public QThread
 {
@@ -79,6 +81,8 @@ private:
   QStatusBar *statBar;
   QLabel lbStatBar;
   WordCount *threadWordCount;
+
+  QDockWidget *dock;
 
   void setupModelView();
   void setupCentralGrid();
