@@ -46,7 +46,8 @@ void DataBase::createTables()
   if(!query.exec("CREATE TABLE words(id integer primary key autoincrement,"
                  "word varchar(30) unique, note varchar(10), pronunciation "
                  "varchar(35),definition varchar(150), rating int, mastered "
-                 "int(1) default 0)"))
+                 "int(1) default 0, "
+                 "timestamp date default (datetime('now','localtime')))"))
     QMessageBox::critical(nullptr, dbErrorStr,
                           query.lastError().text());
 

@@ -15,7 +15,7 @@
 //TODO: Idiom support
 //TODO: Reflect website modifications in already loaded programme
 //TODO: Add multiple language dictionaries
-//TODO: Ability to save database in another location (Share drive, Dropbox, etc.)
+//TODO: Ability to save database in another location (Share drive, Dropbox, etc.). Would need to save settings in .config dir
 //TODO: About window
 //TODO: pdf, csv, excel exports
 //TODO: Db file export/import
@@ -55,6 +55,9 @@ void MainWindow::setupDialogs()
 
   connect(dialogAddWord, &DialogAddWord::wordInserted, this,
           &MainWindow::updateWordCount);
+
+  connect(dialogAddWord, &DialogAddWord::wordUpdated, this,
+          &MainWindow::updateModel);
 
   connect(dialogSettings, &DialogSettings::toggleConfirmDelete, this,
           &MainWindow::toggleConfirmDelete);
@@ -263,8 +266,6 @@ void MainWindow::resizeEvent(QResizeEvent *event)
 
   tableWords->setMinimumHeight(static_cast<int>(height));
 
-  resizeRowsColumns();
-
   double posX = static_cast<double>(this->width()) * 0.32;
   double posY = static_cast<double>(this->height()) * 0.5;
 
@@ -273,13 +274,13 @@ void MainWindow::resizeEvent(QResizeEvent *event)
 
 void MainWindow::resizeRowsColumns()
 {
-  double width = static_cast<double>(centreWidget.width()) * 0.52;
+  double width = static_cast<double>(centreWidget.width()) * 0.5;
 
   tableWords->setColumnWidth(4, static_cast<int>(width));
 
   tableWords->resizeRowsToContents();
 
-  for (int i = 0; i <= 6; ++i)
+  for (int i = 0; i <= 7; ++i)
     if(i != 4)
       tableWords->resizeColumnToContents(i);
 }
@@ -432,6 +433,11 @@ void MainWindow::toggleStatusBar(bool ok)
   {
     statusBar()->hide();
   }
+}
+
+void MainWindow::updateModel()
+{
+  modelWords->select();
 }
 
 void WordCount::run()

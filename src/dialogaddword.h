@@ -32,6 +32,7 @@ private slots:
 signals:
   void linkClicked(QString word);
   void wordInserted();
+  void wordUpdated();
 };
 
 #endif // ADDWORD_H

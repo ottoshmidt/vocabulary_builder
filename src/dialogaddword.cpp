@@ -74,7 +74,10 @@ void DialogAddWord::addWord()
 
   if(rating > 0)
   {
-    query.prepare("UPDATE words SET rating = ? WHERE word = ?");
+    query.prepare("UPDATE words SET "
+                  " rating = ?, "
+                  " timestamp = datetime('now','localtime') "
+                  "WHERE word = ?");
     query.addBindValue(++rating);
     query.addBindValue(word);
 
@@ -93,6 +96,8 @@ void DialogAddWord::addWord()
                        QString::number(rating));
 
       lbGoToWord.setText("<a href=\"http://example.com/\">Go to word</a>");
+
+      emit wordUpdated();
     }
   }
   else

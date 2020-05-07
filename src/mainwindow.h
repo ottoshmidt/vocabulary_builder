@@ -110,6 +110,7 @@ private slots:
   void onBeforeUpdate(int row, QSqlRecord &record);
   void toggleConfirmDelete(bool ok);
   void toggleStatusBar(bool ok);
+  void updateModel();
 };
 
 #endif // MAINWINDOW_H
