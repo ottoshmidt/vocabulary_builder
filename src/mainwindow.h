@@ -62,7 +62,7 @@ private:
   QAction actionDefined;
   QAction actionUndefined;
   QAction actionGotoWord;
-  QAction actionDeleteEntry;
+  QAction actionDeleteRecord;
 
   QScrollArea centralScroll;
   QWidget centreWidget;
@@ -104,8 +104,8 @@ private slots:
   void onDefinedToggle(const bool &b);
   void onUndefinedToggle(const bool &b);
   void applyFilter();
-  void confirmDeleteEntry();
-  void deleteEntry(int row);
+  void confirmDeleteItem();
+  void deleteRecord(int row);
   void updateWordCount();
   void onBeforeUpdate(int row, QSqlRecord &record);
   void toggleConfirmDelete(bool ok);

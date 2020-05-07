@@ -7,15 +7,23 @@
 #include <QScrollBar>
 #include <QStatusBar>
 
-
-//TODO: Possibility change website order
+//TODO: Add New or Filter window is open, switch to other window (alt+tab) switch back, the small window loses focus (annoying).
+//TODO: Timestamp so that words with rating >1 can be sorted newest first (IDs only won't work)
+//TODO: BUG: Go to word link doesn't work properly when one word is added and then another (existing) one is added.
+//TODO: BUG: Find out why Add Word window opens on the first desktop always, and Filter window on the same as the Mainwindow.
+//TODO: BUG: when sorted by name and add new word, problems with appearing that word.
+//TODO: Idiom support
 //TODO: Reflect website modifications in already loaded programme
 //TODO: Add multiple language dictionaries
+//TODO: Ability to save database in another location (Share drive, Dropbox, etc.)
 //TODO: About window
-//TODO: pdf and csv exports
-//TODO: Delete word on right-click
+//TODO: pdf, csv, excel exports
+//TODO: Db file export/import
+//TODO: Delete word on right-click and del button
 //TODO: check if we can set mastered checkbox in the middle automatically
 //TODO: Translations geo,rus
+//TODO: System tray icon (configurable from settings)
+//TODO: Configurable keyboard shortcuts
 
 bool showStatusBar;
 bool confirmDelete;
@@ -221,12 +229,12 @@ void MainWindow::setupMenus()
 
   menuWords.addSeparator();
 
-  actionDeleteEntry.setText(tr("&Delete Record"));
-  actionDeleteEntry.setShortcut(QKeySequence::Delete);
-  actionDeleteEntry.setIcon(QIcon(":/icons/delete.ico"));
-  actionDeleteEntry.setEnabled(false);
-  connect(&actionDeleteEntry, &QAction::triggered, this, &MainWindow::confirmDeleteEntry);
-  menuWords.addAction(&actionDeleteEntry);
+  actionDeleteRecord.setText(tr("&Delete Record"));
+  actionDeleteRecord.setShortcut(QKeySequence::Delete);
+  actionDeleteRecord.setIcon(QIcon(":/icons/delete.ico"));
+  actionDeleteRecord.setEnabled(false);
+  connect(&actionDeleteRecord, &QAction::triggered, this, &MainWindow::confirmDeleteItem);
+  menuWords.addAction(&actionDeleteRecord);
 
   menuBar()->addMenu(&menuWords);
 }
@@ -293,11 +301,11 @@ void MainWindow::onSelectionChanged(const QItemSelection &selected,
       webSearchWord(modelWords->data(i).toString());
     }
 
-    actionDeleteEntry.setEnabled(true);
+    actionDeleteRecord.setEnabled(true);
   }
   else
   {
-    actionDeleteEntry.setEnabled(false);
+    actionDeleteRecord.setEnabled(false);
   }
 }
 
@@ -366,7 +374,7 @@ void MainWindow::applyFilter()
   modelWords->setFilter(filterStr);
 }
 
-void MainWindow::confirmDeleteEntry()
+void MainWindow::confirmDeleteItem()
 {
   int r = tableWords->currentIndex().row();
   QModelIndex i = modelWords->index(r, 1);
@@ -378,16 +386,16 @@ void MainWindow::confirmDeleteEntry()
 
     if(dialogConfirmDelete->exec())
     {
-      deleteEntry(r);
+      deleteRecord(r);
     }
   }
   else
   {
-    deleteEntry(r);
+    deleteRecord(r);
   }
 }
 
-void MainWindow::deleteEntry(int row)
+void MainWindow::deleteRecord(int row)
 {
   modelWords->removeRow(row);
   modelWords->select();

@@ -3,6 +3,9 @@
 
 #include <QApplication>
 
+#include <QMessageBox>
+#include <QSqlDatabase>
+
 int main(int argc, char *argv[])
 {
   QApplication a(argc, argv);
@@ -12,8 +15,10 @@ int main(int argc, char *argv[])
   DataBase dbase;
   Q_UNUSED(dbase)
 
+
   MainWindow w;
   w.showMaximized();
 
   return a.exec();
+//  return 0;
 }
