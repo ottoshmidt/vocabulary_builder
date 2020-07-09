@@ -114,7 +114,7 @@ void DialogAddWord::addWord()
     {
       lbResult.setText("Word '" + word + "' added! Rating: 1");
 
-      leWord.clear();
+
       lbGoToWord.clear();
 
       ModelView::model()->select();
@@ -122,6 +122,8 @@ void DialogAddWord::addWord()
       emit wordInserted();
     }
   }
+
+  leWord.clear();
 }
 
 void DialogAddWord::gotoWord(const QString &link)
