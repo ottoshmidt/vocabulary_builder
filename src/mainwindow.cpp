@@ -12,7 +12,6 @@
 //TODO: BUG: Find out why Add Word window opens on the first desktop always, and Filter window on the same as the Mainwindow.
 //TODO: BUG: when sorted by name and add new word, problems with appearing that word.
 //TODO: Add New or Filter window is open, switch to other window (alt+tab) switch back, the small window loses focus (annoying).
-//TODO: Timestamp so that words with rating >1 can be sorted newest first (IDs only won't work)
 //TODO: Idiom support
 //TODO: Reflect website modifications in already loaded programme
 //TODO: Add multiple language dictionaries
@@ -24,8 +23,8 @@
 //TODO: check if we can set mastered checkbox in the middle automatically
 //TODO: Translations geo,rus
 //TODO: System tray icon (configurable from settings)
-//TODO: Configurable keyboard shortcuts
 //TODO: Clear button in Filter dialog
+//TODO: Configurable keyboard shortcuts
 
 bool showStatusBar;
 bool confirmDelete;

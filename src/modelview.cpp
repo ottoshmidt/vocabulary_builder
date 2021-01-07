@@ -44,7 +44,7 @@ void ModelView::setupModel()
   modelWords->setHeaderData(4, Qt::Horizontal, tr("Definition"));
   modelWords->setHeaderData(5, Qt::Horizontal, tr("Rating"));
   modelWords->setHeaderData(6, Qt::Horizontal, tr("Mastered"));
-  modelWords->setHeaderData(7, Qt::Horizontal, tr("Create Time"));
+  modelWords->setHeaderData(7, Qt::Horizontal, tr("Update Time"));
 
   modelWords->select();
 }
@@ -55,6 +55,7 @@ void ModelView::setupView()
 
   tableWords->setModel(modelWords);
   tableWords->setSortingEnabled(true);
+  tableWords->sortByColumn(7, Qt::DescendingOrder);
 
   cbDelegate = new CheckBoxDelegate(tableWords);
   tableWords->setItemDelegateForColumn(6, cbDelegate);
