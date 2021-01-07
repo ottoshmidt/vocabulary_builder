@@ -7,21 +7,21 @@
 #include <QScrollBar>
 #include <QStatusBar>
 
-//TODO: BUG: Enter a misspelled word, then correct it but that correct word is already contained in the dict. Action?
 //TODO: BUG: Go to word link doesn't work properly when one word is added and then another (existing) one is added.
-//TODO: BUG: Find out why Add Word window opens on the first desktop always, and Filter window on the same as the Mainwindow.
+//TODO: BUG: Enter a misspelled word, then correct it but that correct word is already contained in the dict. Action?
 //TODO: BUG: when sorted by name and add new word, problems with appearing that word.
 //TODO: Add New or Filter window is open, switch to other window (alt+tab) switch back, the small window loses focus (annoying).
 //TODO: Idiom support
-//TODO: Reflect website modifications in already loaded programme
 //TODO: Add multiple language dictionaries
+//TODO: Reflect website modifications in settings in already loaded programme
+
 //TODO: Ability to save database in another location (Share drive, Dropbox, etc.). Would need to save settings in .config dir
-//TODO: About window
-//TODO: pdf, csv, excel exports
 //TODO: Db file export/import
 //TODO: Delete word on right-click and del button
 //TODO: check if we can set mastered checkbox in the middle automatically
 //TODO: Translations geo,rus
+//TODO: About window
+//TODO: pdf, csv, excel exports
 //TODO: System tray icon (configurable from settings)
 //TODO: Clear button in Filter dialog
 //TODO: Configurable keyboard shortcuts
