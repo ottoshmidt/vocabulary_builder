@@ -170,8 +170,8 @@ void MainWindow::setupMenus()
 
   menuWords.setTitle(tr("&Words"));
 
-  actionAddWord.setText(tr("&New Word"));
-  actionAddWord.setShortcut(QKeySequence::New);
+  actionAddWord.setText(tr("&Add Word"));
+  actionAddWord.setShortcut(Qt::CTRL + Qt::Key_A);
   actionAddWord.setIcon(QIcon(":/icons/new.ico"));
   connect(&actionAddWord, &QAction::triggered, dialogAddWord, &QDialog::show);
   menuWords.addAction(&actionAddWord);
