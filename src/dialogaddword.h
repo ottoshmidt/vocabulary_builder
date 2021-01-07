@@ -18,19 +18,16 @@ public:
 private:
   QLineEdit leWord;
   QLabel lbResult;
-  QLabel lbGoToWord;
   QGridLayout gridLayout;
   QPushButton pbAddWord;
   QPushButton pbCloseWindow;
 
-  void hideEvent(QHideEvent *event);
+  void hideEvent(QHideEvent *event) override;
 
 private slots:
   void addWord();
-  void gotoWord(const QString &link);
 
 signals:
-  void linkClicked(QString word);
   void wordInserted();
   void wordUpdated();
 };

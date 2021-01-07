@@ -92,7 +92,8 @@ private:
   void webSearchWord(const QString &word);
   void clearBrowsers();
 
-  void resizeEvent(QResizeEvent *event);
+  void resizeEvent(QResizeEvent *event) override;
+  void showEvent(QShowEvent *event) override;
 
 private slots:
   void resizeRowsColumns();

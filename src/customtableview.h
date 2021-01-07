@@ -16,11 +16,9 @@ signals:
   void selectionChangedSig(const QItemSelection &selected,
                            const QItemSelection &deselected);
 private:
-  bool viewportEvent(QEvent *e);
-
-
+  bool viewportEvent(QEvent *e) override;
   void selectionChanged(const QItemSelection &selected,
-                        const QItemSelection &deselected);
+                        const QItemSelection &deselected) override;
 };
 
 #endif // CUSTOMTABLEVIEW_H

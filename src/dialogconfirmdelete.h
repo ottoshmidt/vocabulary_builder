@@ -25,7 +25,7 @@ private:
   void setupWidgets();
   void setupLayout();
 
-  void showEvent(QShowEvent *event);
+  void showEvent(QShowEvent *event) override;
 
 private slots:
   void onDontAskToggle(const bool &checked);

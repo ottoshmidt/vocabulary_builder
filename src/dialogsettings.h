@@ -56,7 +56,7 @@ private:
 
   bool firstRun = true;
 
-  void showEvent(QShowEvent *event);
+  void showEvent(QShowEvent *event) override;
 
 private slots:
   void onWebsiteAdd();

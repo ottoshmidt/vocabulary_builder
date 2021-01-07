@@ -25,7 +25,7 @@ private:
   void setupWidgets();
   void setupLayout();
 
-  void hideEvent(QHideEvent *event);
+  void hideEvent(QHideEvent *event) override;
 
   bool firstRun;
 

@@ -7,14 +7,12 @@
 #include <QScrollBar>
 #include <QStatusBar>
 
-//TODO: BUG: Go to word link doesn't work properly when one word is added and then another (existing) one is added.
 //TODO: BUG: Enter a misspelled word, then correct it but that correct word is already contained in the dict. Action?
 //TODO: BUG: when sorted by name and add new word, problems with appearing that word.
-//TODO: Add New or Filter window is open, switch to other window (alt+tab) switch back, the small window loses focus (annoying).
 //TODO: Idiom support
 //TODO: Add multiple language dictionaries
-//TODO: Reflect website modifications in settings in already loaded programme
 
+//TODO: Reflect website modifications in settings in already loaded programme
 //TODO: Ability to save database in another location (Share drive, Dropbox, etc.). Would need to save settings in .config dir
 //TODO: Db file export/import
 //TODO: Delete word on right-click and del button
@@ -50,9 +48,6 @@ void MainWindow::setupDialogs()
   dialogSettings = new DialogSettings(this);
   dialogGotoWord = new DialogGotoWord(this);
   dialogConfirmDelete = new DialogConfirmDelete(this);
-
-  connect(dialogAddWord, &DialogAddWord::linkClicked, dialogGotoWord,
-          &DialogGotoWord::gotoWord);
 
   connect(dialogAddWord, &DialogAddWord::wordInserted, this,
           &MainWindow::updateWordCount);
@@ -271,6 +266,18 @@ void MainWindow::resizeEvent(QResizeEvent *event)
   double posY = static_cast<double>(this->height()) * 0.5;
 
   dialogAddWord->move(static_cast<int>(posX), static_cast<int>(posY));
+}
+
+void MainWindow::showEvent(QShowEvent *event)
+{
+  QMainWindow::showEvent(event);
+
+  if (dialogAddWord->isVisible())
+    dialogAddWord->raise();
+  else if (dialogGotoWord->isVisible())
+    dialogGotoWord->raise();
+  else if (dialogfilterWord->isVisible())
+    dialogfilterWord->raise();
 }
 
 void MainWindow::resizeRowsColumns()
