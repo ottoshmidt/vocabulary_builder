@@ -7,6 +7,8 @@
 #include <QScrollBar>
 #include <QStatusBar>
 
+//TODO: Clear button in Filter dialog
+//TODO: Maybe use "Insert DateTime" or "Insert Timestamp" instead of just "Timestamp" in view.
 //TODO: Add New or Filter window is open, switch to other window (alt+tab) switch back, the small window loses focus (annoying).
 //TODO: Timestamp so that words with rating >1 can be sorted newest first (IDs only won't work)
 //TODO: BUG: Go to word link doesn't work properly when one word is added and then another (existing) one is added.
@@ -24,6 +26,7 @@
 //TODO: Translations geo,rus
 //TODO: System tray icon (configurable from settings)
 //TODO: Configurable keyboard shortcuts
+//TODO: BUG: Enter a misspelled word, then correct it but that correct word is already contained in the dict. Action?
 
 bool showStatusBar;
 bool confirmDelete;
