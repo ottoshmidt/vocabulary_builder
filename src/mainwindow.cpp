@@ -12,6 +12,7 @@
 //TODO: Idiom support
 //TODO: Add multiple language dictionaries
 
+//TODO: Dark theme
 //TODO: Reflect website modifications in settings in already loaded programme
 //TODO: Ability to save database in another location (Share drive, Dropbox, etc.). Would need to save settings in .config dir
 //TODO: Db file export/import
