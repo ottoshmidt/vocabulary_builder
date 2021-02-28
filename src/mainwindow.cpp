@@ -167,7 +167,10 @@ void MainWindow::setupMenus()
   menuWords.setTitle(tr("&Words"));
 
   actionAddWord.setText(tr("&Add Word"));
-  actionAddWord.setShortcut(Qt::CTRL + Qt::Key_A);
+  QList<QKeySequence> addShortcuts;
+  addShortcuts.append(Qt::CTRL + Qt::Key_A);
+  addShortcuts.append(Qt::CTRL + Qt::Key_N);
+  actionAddWord.setShortcuts(addShortcuts);
   actionAddWord.setIcon(QIcon(":/icons/new.ico"));
   connect(&actionAddWord, &QAction::triggered, dialogAddWord, &QDialog::show);
   menuWords.addAction(&actionAddWord);
@@ -289,7 +292,7 @@ void MainWindow::resizeRowsColumns()
 
   tableWords->resizeRowsToContents();
 
-  for (int i = 0; i <= 7; ++i)
+  for (int i = 0; i <= modelWords->columnCount(); ++i)
     if(i != 4)
       tableWords->resizeColumnToContents(i);
 }

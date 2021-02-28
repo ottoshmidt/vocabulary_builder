@@ -45,6 +45,7 @@ void ModelView::setupModel()
   modelWords->setHeaderData(5, Qt::Horizontal, tr("Rating"));
   modelWords->setHeaderData(6, Qt::Horizontal, tr("Mastered"));
   modelWords->setHeaderData(7, Qt::Horizontal, tr("Update Time"));
+  modelWords->setHeaderData(8, Qt::Horizontal, tr("Create Time"));
 
   modelWords->select();
 }

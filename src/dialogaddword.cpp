@@ -73,7 +73,7 @@ void DialogAddWord::addWord()
   {
     query.prepare("UPDATE words SET "
                   " rating = ?, "
-                  " timestamp = datetime('now','localtime') "
+                  " updatetime = datetime('now','localtime') "
                   "WHERE word = ?");
     query.addBindValue(++rating);
     query.addBindValue(word);

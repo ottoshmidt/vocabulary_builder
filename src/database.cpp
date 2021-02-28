@@ -47,7 +47,8 @@ void DataBase::createTables()
                  "word varchar(30) unique, note varchar(10), pronunciation "
                  "varchar(35),definition varchar(150), rating int, mastered "
                  "int(1) default 0, "
-                 "timestamp date default (datetime('now','localtime')))"))
+                 "updatetime date default (datetime('now','localtime'))),"
+                 "createtime date default (datetime('now','localtime')))"))
     QMessageBox::critical(nullptr, dbErrorStr,
                           query.lastError().text());
 
