@@ -107,7 +107,7 @@ void DialogAddWord::addWord()
     }
     else
     {
-      lbResult.setText("Word '" + word + "' added! Rating: 1");
+      lbResult.setText("Word '" + word + "' added. Rating: 1");
 
       ModelView::model()->select();
 
