@@ -10,5 +10,6 @@
         <file>icons/settings1.ico</file>
         <file>icons/goto.ico</file>
         <file>icons/refresh.ico</file>
+        <file>icons/language.ico</file>
     </qresource>
 </RCC>

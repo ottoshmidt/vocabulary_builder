@@ -97,9 +97,10 @@ void DialogAddWord::addWord()
   }
   else
   {
-    query.prepare("INSERT INTO words(word, rating) values(?,?)");
+    query.prepare("INSERT INTO words(word, rating, language_fk) values(?,?,?)");
     query.addBindValue(word);
     query.addBindValue(1);
+    query.addBindValue(DataBase::getSetting("current_language"));
 
     if(!query.exec())
     {

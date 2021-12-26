@@ -119,10 +119,10 @@ void DataBase::updateSetting(const QString &param, const QVariant &value)
                           query.lastError().text());
 }
 
-bool DataBase::getSetting(const QString &param)
+int DataBase::getSetting(const QString &param)
 {
   QSqlQuery query(db);
-  bool res = false;
+  int res = false;
 
   query.prepare("select value from settings where key = ?");
   query.addBindValue(param);
@@ -133,7 +133,7 @@ bool DataBase::getSetting(const QString &param)
 
 
   while(query.next())
-    res = query.value(0).toBool();
+    res = query.value(0).toInt();
 
   return res;
 }

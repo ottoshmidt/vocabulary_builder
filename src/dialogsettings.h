@@ -5,13 +5,13 @@
 #include "checkboxdelegate.h"
 #include "modelview.h"
 
-#include <QSqlTableModel>
+#include <QSqlRelationalTableModel>
 #include <QDialog>
 #include <QPushButton>
 #include <QCheckBox>
 #include <QGridLayout>
-#include <QListWidget>
-#include <QListWidgetItem>
+#include <QTreeWidget>
+#include <QTreeWidgetItem>
 #include <QLabel>
 #include <QShowEvent>
 
@@ -26,23 +26,24 @@ public:
 private:
   QGridLayout glSettings;
   QPushButton pbSettingsClose;
-  QListWidget listWidgetSettings;
-  QListWidget treeWdgUrls;
-  QLabel *labelLangStngs;
-  QListWidgetItem *listItemGeneral;
-  QListWidgetItem *listItemWebsites;
-  QListView listViewLanguages;
-  QWidget widgetSettingsLanguages;
+  QTreeWidget treeWidgetSettings;
+  QLabel *labelWebsites;
+  QTreeWidgetItem *treeItemGeneral;
+  QTreeWidgetItem *treeItemWebsites;
+  QWidget widgetSettingsWebsites;
 
   QWidget widgetSettingsGeneral;
-  QVBoxLayout glSettingsGeneral;
+  QGridLayout glSettingsGeneral;
   QCheckBox cbAlternatigRows;
   QCheckBox cbConfirmDelete;
   QCheckBox cbStatusBar;
 
   CustomTableView *tableWebsites;
-  QSqlTableModel *modelWebsites;
+  QTableView *tableLanguages;
+  QSqlRelationalTableModel *modelWebsites;
+  QSqlTableModel *modelLanguages;
   QGridLayout glSettingsLanguage;
+  QPushButton pbLanguageAdd;
   QPushButton pbWebsiteAdd;
   QPushButton pbWebsiteDelete;
 
@@ -56,16 +57,18 @@ private:
 
   bool firstRun = true;
 
+  int languageID;
+
   void showEvent(QShowEvent *event) override;
 
 private slots:
+  void onLanguageAdd();
   void onWebsiteAdd();
   void onWebsiteDelete();
-  void onSettingsRowChange(int row);
+  void onSettingsRowChange(QTreeWidgetItem *current, QTreeWidgetItem *previous);
   void switchAlternatingRowColors(bool checked);
   void switchConfirmDelete(bool checked);
   void switchStatusBar(bool checked);
-  void onBeforeInsert(QSqlRecord &record);
 
 signals:
   void toggleConfirmDelete(bool ok);

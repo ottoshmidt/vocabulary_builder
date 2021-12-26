@@ -10,7 +10,6 @@
 //TODO: BUG: Enter a misspelled word, then correct it but that correct word is already contained in the dict. Action?
 //TODO: BUG: when sorted by name and add new word, problems with appearing that word.
 //TODO: Idiom support
-//TODO: Add multiple language dictionaries
 
 //TODO: Dark theme
 //TODO: Reflect website modifications in settings in already loaded programme
@@ -18,7 +17,7 @@
 //TODO: Db file export/import
 //TODO: Delete word on right-click and del button
 //TODO: check if we can set mastered checkbox in the middle automatically
-//TODO: Translations geo,rus
+//TODO: Interface translations geo,rus
 //TODO: About window
 //TODO: pdf, csv, excel exports
 //TODO: System tray icon (configurable from settings)
@@ -93,37 +92,8 @@ void MainWindow::setupCentralGrid()
 
   glCentralGrid.addWidget(tableWords, 0, 0, 1, 2);
 
-  QSqlQuery query(DataBase::getDb());
-
-  if(!query.exec("select url from urls where enabled = 1 order by id"))
-    QMessageBox::critical(nullptr, "Database Error", query.lastError().text());
-
-  while(query.next())
-    urls.append(query.value(0).toString());
-
-  int row = 1;
-  int col = 0;
-
-  for(int i = 0; i < urls.count(); i++)
-  {
-    auto *webView = new QWebEngineView(&centreWidget);
-
-    webView->setMinimumHeight(550);
-
-    glCentralGrid.addWidget(webView, row, col);
-
-    webViewList.append(webView);
-
-    if(col == 0)
-    {
-      col = 1;
-    }
-    else
-    {
-      row++;
-      col = 0;
-    }
-  }
+  updateUrls();
+  addWebViews();
 
   statBar = new QStatusBar();
   statBar->addWidget(&lbStatBar);
@@ -143,6 +113,27 @@ void MainWindow::setupMenus()
   connect(&actionClearBrowsers, &QAction::triggered, this,
           &MainWindow::clearBrowsers);
   menuMain.addAction(&actionClearBrowsers);
+
+  QMenu *languageMenu = menuMain.addMenu(QIcon(":/icons/language.ico"), "Language");
+  actionsLanguages = new QActionGroup(languageMenu);
+  QSqlQuery query(DataBase::getDb());
+
+  if(!query.exec("select id, language from languages"))
+    QMessageBox::critical(nullptr, tr("Database Error when getting languages"),
+                          query.lastError().text());
+
+  while(query.next())
+  {
+    languages.append(new QAction(query.value(1).toString(), actionsLanguages));
+
+    if (DataBase::getSetting("current_language") == query.value(0).toInt())
+      languages.last()->setChecked(true);
+  }
+
+  actionsLanguages->setExclusive(true);
+  languageMenu->addActions(actionsLanguages->actions());
+  connect(actionsLanguages, &QActionGroup::triggered, this,
+          &MainWindow::actionLanguage);
 
   actionSettings.setText(tr("&Settings"));
   actionSettings.setShortcut(QKeySequence(Qt::CTRL + Qt::ALT + Qt::Key_S));
@@ -240,6 +231,50 @@ void MainWindow::setupMenus()
   menuWords.addAction(&actionDeleteRecord);
 
   menuBar()->addMenu(&menuWords);
+}
+
+void MainWindow::updateUrls()
+{
+  urls.clear();
+
+  QSqlQuery query(DataBase::getDb());
+
+  query.prepare("select url from urls where enabled = 1 and language_fk = ? "
+                "order by id");
+  query.addBindValue(DataBase::getSetting("current_language"));
+
+  if(!query.exec())
+    QMessageBox::critical(nullptr, "Database Error", query.lastError().text());
+
+  while(query.next())
+    urls.append(query.value(0).toString());
+}
+
+void MainWindow::addWebViews()
+{
+  for(int i = 0; i < urls.count() - currentViews; i++)
+  {
+    auto *webView = new QWebEngineView(&centreWidget);
+
+    webView->setMinimumHeight(550);
+
+    glCentralGrid.addWidget(webView, row, col);
+
+    webViewList.append(webView);
+
+    if(col == 0)
+    {
+      col = 1;
+    }
+    else
+    {
+      row++;
+      col = 0;
+    }
+  }
+
+  if (urls.count() > currentViews)
+    currentViews = urls.count();
 }
 
 void MainWindow::webSearchWord(const QString &word)
@@ -450,6 +485,30 @@ void MainWindow::toggleStatusBar(bool ok)
 void MainWindow::updateModel()
 {
   modelWords->select();
+}
+
+void MainWindow::actionLanguage(const QAction *action)
+{
+  QSqlQuery query(DataBase::getDb());
+
+  query.prepare("select id from languages where language = ?");
+  query.addBindValue(action->text());
+
+  if(!query.exec())
+    QMessageBox::critical(nullptr, tr("Database Error in getting language id"),
+                          query.lastError().text());
+
+  while(query.next())
+  {
+    int languageID = query.value(0).toInt();
+
+    DataBase::updateSetting("current_language", languageID);
+    modelWords->setFilter("language_fk = " + QString::number(languageID));
+
+
+    updateUrls();
+    addWebViews();
+  }
 }
 
 void WordCount::run()

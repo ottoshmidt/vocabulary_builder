@@ -15,7 +15,7 @@ public:
   static void setup();
   static QSqlDatabase getDb();
   static void updateSetting(const QString &param, const QVariant &value);
-  static bool getSetting(const QString &param);
+  static int getSetting(const QString &param);
 
 private:
   static QSqlDatabase db;

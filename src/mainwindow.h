@@ -64,6 +64,9 @@ private:
   QAction actionGotoWord;
   QAction actionDeleteRecord;
 
+  QActionGroup *actionsLanguages;
+  QList<QAction*> languages;
+
   QScrollArea centralScroll;
   QWidget centreWidget;
   QGridLayout glCentralGrid;
@@ -82,12 +85,16 @@ private:
   QLabel lbStatBar;
   WordCount *threadWordCount;
 
-  QDockWidget *dock;
-
   void setupModelView();
   void setupCentralGrid();
   void setupDialogs();
   void setupMenus();
+  void updateUrls();
+  void addWebViews();
+
+  int row = 1;
+  int col = 0;
+  int currentViews = 0;
 
   void webSearchWord(const QString &word);
   void clearBrowsers();
@@ -112,6 +119,7 @@ private slots:
   void toggleConfirmDelete(bool ok);
   void toggleStatusBar(bool ok);
   void updateModel();
+  void actionLanguage(const QAction *action);
 };
 
 #endif // MAINWINDOW_H

@@ -28,14 +28,24 @@ DialogSettings::~DialogSettings()
 
 void DialogSettings::setupWidgets()
 {
-  listWidgetSettings.setFixedSize(90, 370);
-  connect(&listWidgetSettings, &QListWidget::currentRowChanged, this,
+  treeWidgetSettings.setFixedSize(110, 370);
+  treeWidgetSettings.setHeaderHidden(true);
+  connect(&treeWidgetSettings, &QTreeWidget::currentItemChanged, this,
           &DialogSettings::onSettingsRowChange);
 
-  listItemGeneral = new QListWidgetItem(&listWidgetSettings);
-  listItemGeneral->setText(tr("General"));
-  listItemWebsites = new QListWidgetItem(&listWidgetSettings);
-  listItemWebsites->setText(tr("Websites"));
+  treeItemGeneral = new QTreeWidgetItem(&treeWidgetSettings);
+  treeItemGeneral->setText(0, tr("General"));
+  treeItemWebsites = new QTreeWidgetItem(&treeWidgetSettings);
+  treeItemWebsites->setText(0, tr("Websites"));
+
+  QSqlQuery query(DataBase::getDb());
+
+  if(!query.exec("select language from languages"))
+    QMessageBox::critical(nullptr, tr("Database Error when getting languages"),
+                          query.lastError().text());
+
+  while(query.next())
+    new QTreeWidgetItem(treeItemWebsites, QStringList(query.value(0).toString()));
 
   cbAlternatigRows.setText(tr("Alternating row colours"));
   connect(&cbAlternatigRows, &QCheckBox::toggled, this,
@@ -44,6 +54,10 @@ void DialogSettings::setupWidgets()
   cbConfirmDelete.setText(tr("Confirm when deleting word"));
   connect(&cbConfirmDelete, &QCheckBox::toggled, this,
           &DialogSettings::switchConfirmDelete);
+
+  pbLanguageAdd.setText("Add");
+  connect(&pbLanguageAdd, &QPushButton::clicked, this,
+          &DialogSettings::onLanguageAdd);
 
   cbStatusBar.setText(tr("Show status bar with word statistics"));
   connect(&cbStatusBar, &QCheckBox::toggled, this,
@@ -65,61 +79,70 @@ void DialogSettings::setupWidgets()
   extern bool showStatusBar;
   showStatusBar = b;
 
-  labelLangStngs = new QLabel(&widgetSettingsLanguages);
-  labelLangStngs->setText(tr("When adding a website insert '{word}' (without quotes)"
+  labelWebsites = new QLabel(&widgetSettingsWebsites);
+  labelWebsites->setText(tr("When adding a website insert '{word}' (without quotes)"
                           " in the url, where a search word should be placed."));
 
   pbSettingsClose.setParent(this);
   pbSettingsClose.setText(tr("Close"));
   connect(&pbSettingsClose, &QPushButton::released, this, &QDialog::close);
 
-  pbWebsiteAdd.setParent(&widgetSettingsLanguages);
+  pbWebsiteAdd.setParent(&widgetSettingsWebsites);
   pbWebsiteAdd.setText(tr("Add"));
-  connect(&pbWebsiteAdd, &QPushButton::released, this, &DialogSettings::onWebsiteAdd);
-  pbWebsiteDelete.setParent(&widgetSettingsLanguages);
+  connect(&pbWebsiteAdd, &QPushButton::released, this,
+          &DialogSettings::onWebsiteAdd);
+  pbWebsiteDelete.setParent(&widgetSettingsWebsites);
   pbWebsiteDelete.setText(tr("Delete"));
   connect(&pbWebsiteDelete, &QPushButton::released, this,
           &DialogSettings::onWebsiteDelete);
 
-  widgetSettingsLanguages.hide();
+  widgetSettingsWebsites.hide();
 }
 
 void DialogSettings::setupLayout()
 {
-  glSettingsGeneral.addWidget(&cbAlternatigRows, 0);
-  glSettingsGeneral.addWidget(&cbConfirmDelete, 1);
-  glSettingsGeneral.addWidget(&cbStatusBar, 2);
-  glSettingsGeneral.addStretch(1);
+  glSettingsGeneral.addWidget(&cbAlternatigRows, 0, 0, 1, 3);
+  glSettingsGeneral.addWidget(&cbConfirmDelete, 1, 0, 1, 3);
+  glSettingsGeneral.addWidget(&cbStatusBar, 2, 0, 1, 3);
+  glSettingsGeneral.addWidget(&pbLanguageAdd, 3, 0);
+  glSettingsGeneral.addWidget(tableLanguages, 4, 0, 1, 2);
+  glSettingsGeneral.setColumnStretch(1, 1);
+  glSettingsGeneral.setColumnStretch(2, 9);
+  glSettingsGeneral.setRowStretch(5, 1);
   widgetSettingsGeneral.setLayout(&glSettingsGeneral);
 
-  glSettingsLanguage.addWidget(labelLangStngs, 0, 0, 1, 3);
+  glSettingsLanguage.addWidget(labelWebsites, 0, 0, 1, 3);
   glSettingsLanguage.addWidget(&pbWebsiteAdd, 1, 0);
   glSettingsLanguage.addWidget(&pbWebsiteDelete, 1, 1);
   glSettingsLanguage.addWidget(tableWebsites, 2, 0, 1, 3);
   glSettingsLanguage.setColumnStretch(2, 1);
-  widgetSettingsLanguages.setLayout(&glSettingsLanguage);
+  widgetSettingsWebsites.setLayout(&glSettingsLanguage);
 
-  glSettings.addWidget(&listWidgetSettings, 0, 0);
+  glSettings.addWidget(&treeWidgetSettings, 0, 0);
   glSettings.addWidget(&widgetSettingsGeneral, 0, 1, 1, 2);
-  glSettings.addWidget(&widgetSettingsLanguages, 0, 1, 1, 2);
+  glSettings.addWidget(&widgetSettingsWebsites, 0, 1, 1, 2);
   glSettings.addWidget(&pbSettingsClose, 1, 2);
   glSettings.setColumnStretch(0, 0);
   glSettings.setColumnStretch(1, 1);
 
   setLayout(&glSettings);
 
-  // Don't move from here (window will flicker on startup)
-  listWidgetSettings.setCurrentRow(0);
+  treeWidgetSettings.setCurrentItem(treeItemGeneral);
 }
 
 void DialogSettings::setupModel()
 {
-  modelWebsites = new QSqlTableModel(&widgetSettingsLanguages, DataBase::getDb());
-  modelWebsites->setTable("urls");
-  modelWebsites->setEditStrategy(QSqlTableModel::OnFieldChange);
-  connect(modelWebsites, &QSqlTableModel::beforeInsert, this,
-          &DialogSettings::onBeforeInsert);
+  modelLanguages = new QSqlTableModel(&widgetSettingsGeneral, DataBase::getDb());
+  modelLanguages->setTable("languages");
+  modelLanguages->setEditStrategy(QSqlTableModel::OnFieldChange);
+  modelLanguages->setHeaderData(1, Qt::Horizontal, tr("Language"));
+  modelLanguages->select();
 
+  modelWebsites = new QSqlRelationalTableModel(&widgetSettingsWebsites,
+                                               DataBase::getDb());
+  modelWebsites->setTable("urls");
+  modelWebsites->setRelation(3, QSqlRelation("languages", "id", "language"));
+  modelWebsites->setEditStrategy(QSqlTableModel::OnFieldChange);
   modelWebsites->setHeaderData(0, Qt::Horizontal, tr("ID"));
   modelWebsites->setHeaderData(1, Qt::Horizontal, tr("URL"));
   modelWebsites->setHeaderData(2, Qt::Horizontal, tr("Enabled"));
@@ -128,7 +151,12 @@ void DialogSettings::setupModel()
 
 void DialogSettings::setupView()
 {
-  tableWebsites = new CustomTableView(&widgetSettingsLanguages);
+  tableLanguages = new QTableView(&widgetSettingsGeneral);
+  tableLanguages->setModel(modelLanguages);
+  tableLanguages->hideColumn(0);
+  tableLanguages->resizeRowsToContents();
+
+  tableWebsites = new CustomTableView(&widgetSettingsWebsites);
   cbDelegate = new CheckBoxDelegate(tableWebsites);
 
   tableWebsites->setItemDelegateForColumn(2, cbDelegate);
@@ -152,19 +180,43 @@ void DialogSettings::showEvent(QShowEvent *event)
   event->accept();
 }
 
-void DialogSettings::onSettingsRowChange(int row)
+void DialogSettings::onSettingsRowChange(QTreeWidgetItem *current,
+                                         QTreeWidgetItem *previous)
 {
-  switch(row)
+  if (current->text(0) == "General")
   {
-    case 0:
-      widgetSettingsLanguages.hide();
-      widgetSettingsGeneral.show();
-      break;
-    case 1:
-      widgetSettingsGeneral.hide();
-      widgetSettingsLanguages.show();
-      break;
+    widgetSettingsGeneral.show();
+    widgetSettingsWebsites.hide();
   }
+  else if (current->text(0) == "Websites")
+  {
+    widgetSettingsGeneral.hide();
+    widgetSettingsWebsites.hide();
+  }
+  else
+  {
+    widgetSettingsGeneral.hide();
+    widgetSettingsWebsites.show();
+
+    QString lang = current->text(0);
+
+    QSqlQuery query(DataBase::getDb());
+
+    query.prepare("select id from languages where language = ?");
+    query.addBindValue(lang);
+
+    if(!query.exec())
+      QMessageBox::critical(nullptr, tr("Database Error in getting language id"),
+                            query.lastError().text());
+
+    while(query.next())
+      languageID = query.value(0).toInt();
+
+    modelWebsites->setFilter("relTblAl_3.language = '" + lang + "'");
+    tableWebsites->resizeRowsToContents();
+  }
+
+  Q_UNUSED(previous)
 }
 
 void DialogSettings::switchAlternatingRowColors(bool checked)
@@ -197,20 +249,18 @@ void DialogSettings::switchStatusBar(bool checked)
   firstRun = false;
 }
 
-void DialogSettings::onBeforeInsert(QSqlRecord &record)
+void DialogSettings::onLanguageAdd()
 {
-  if(!record.value("url").toString().isEmpty())
-  {
-    record.setValue("language_fl", 1);
-    record.setValue("enabled", 1);
-
-    tableWebsites->resizeRowsToContents();
-  }
+  modelLanguages->insertRow(modelLanguages->rowCount());
 }
 
 void DialogSettings::onWebsiteAdd()
 {
-  modelWebsites->insertRow(modelWebsites->rowCount());
+  int row = modelWebsites->rowCount();
+
+  modelWebsites->insertRow(row);
+  modelWebsites->setData(modelWebsites->index(row, 2), 1);
+  modelWebsites->setData(modelWebsites->index(row, 3), languageID);
 }
 
 void DialogSettings::onWebsiteDelete()
