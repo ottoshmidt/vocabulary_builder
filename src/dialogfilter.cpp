@@ -16,6 +16,14 @@ DialogFilter::DialogFilter(QWidget *parent)
   setupLayout();
 }
 
+void DialogFilter::onTabChange(QSqlTableModel *model, QTableView *view,
+                               int currentTab)
+{
+  this->model = model;
+  this->view = view;
+  this->currentTab = currentTab;
+}
+
 void DialogFilter::setupWidgets()
 {
   cbInWords.setText(tr("In Words"));
@@ -71,6 +79,8 @@ void DialogFilter::hideEvent(QHideEvent *event)
 
 void DialogFilter::filterWord()
 {
+  QString langFilter = "language_fk = " + QString::number(
+                         DataBase::getSetting("current_language")) + " and ";
   QString wordFilter;
   QString defFilter;
 
@@ -83,15 +93,16 @@ void DialogFilter::filterWord()
 
     if(cbInWords.isChecked() && !cbInDefinitions.isChecked())
     {
-      modelWords->setFilter(wordFilter);
+      modelWords->setFilter(langFilter + wordFilter);
     }
     else if(!cbInWords.isChecked() && cbInDefinitions.isChecked())
     {
-      modelWords->setFilter(defFilter);
+      modelWords->setFilter(langFilter + defFilter);
     }
     else if(cbInWords.isChecked() && cbInDefinitions.isChecked())
     {
-      modelWords->setFilter(wordFilter + " or " + defFilter);
+      modelWords->setFilter(langFilter + " (" + wordFilter + " or " + defFilter
+                            + " )");
     }
   }
   else
@@ -101,15 +112,16 @@ void DialogFilter::filterWord()
 
     if(cbInWords.isChecked() && !cbInDefinitions.isChecked())
     {
-      modelWords->setFilter(wordFilter);
+      modelWords->setFilter(langFilter + wordFilter);
     }
     else if(!cbInWords.isChecked() && cbInDefinitions.isChecked())
     {
-      modelWords->setFilter(defFilter);
+      modelWords->setFilter(langFilter + defFilter);
     }
     else if(cbInWords.isChecked() && cbInDefinitions.isChecked())
     {
-      modelWords->setFilter(wordFilter + " or " + defFilter);
+      modelWords->setFilter(langFilter + " (" + wordFilter + " or " + defFilter
+                            + " )");
     }
   }
 }

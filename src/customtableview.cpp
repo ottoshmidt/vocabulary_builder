@@ -2,12 +2,6 @@
 
 #include <QDebug>
 
-CustomTableView::CustomTableView(QWidget *parent) :
-  QTableView(parent)
-{
-
-}
-
 bool CustomTableView::viewportEvent(QEvent *e)
 {
   QAbstractItemView::viewportEvent(e);
@@ -17,9 +11,8 @@ bool CustomTableView::viewportEvent(QEvent *e)
   return true;
 }
 
-
 void CustomTableView::selectionChanged(const QItemSelection &selected,
-                                  const QItemSelection &deselected)
+                                       const QItemSelection &deselected)
 {
   emit selectionChangedSig(selected, deselected);
 }

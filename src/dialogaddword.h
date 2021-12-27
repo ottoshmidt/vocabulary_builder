@@ -15,6 +15,8 @@ class DialogAddWord : public QDialog
 public:
   DialogAddWord(QWidget *parent = nullptr);
 
+  void setCurrentTab(int currentTab);
+
 private:
   QLineEdit leWord;
   QLabel lbResult;
@@ -22,7 +24,10 @@ private:
   QPushButton pbAddWord;
   QPushButton pbCloseWindow;
 
+  int currentTab;
+
   void hideEvent(QHideEvent *event) override;
+
 
 private slots:
   void addWord();

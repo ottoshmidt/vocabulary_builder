@@ -7,11 +7,15 @@
 #include <QGridLayout>
 #include <QPushButton>
 #include <QHideEvent>
+#include <QSqlTableModel>
+#include <QTableView>
 
 class DialogFilter : public QDialog
 {
 public:
   DialogFilter(QWidget *parent = nullptr);
+
+  void onTabChange(QSqlTableModel *model, QTableView *view, int currentTab);
 
 private:
   QLineEdit leFilterWord;
@@ -21,6 +25,10 @@ private:
   QPushButton pbfilterWord;
   QPushButton pbfilterWordClose;
   QGridLayout glfilterWord;
+
+  QSqlTableModel *model;
+  QTableView *view;
+  int currentTab;
 
   void setupWidgets();
   void setupLayout();

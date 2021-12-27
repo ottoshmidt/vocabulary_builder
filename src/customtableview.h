@@ -2,14 +2,13 @@
 #define CUSTOMTABLEVIEW_H
 
 #include <QTableView>
-#include <QTableWidget>
 
 class CustomTableView : public QTableView
 {
   Q_OBJECT
 
 public:
-  CustomTableView(QWidget *parent = nullptr);
+  CustomTableView(QWidget *parent = nullptr) : QTableView(parent) {};
 
 signals:
   void viewPortChanged();

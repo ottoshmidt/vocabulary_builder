@@ -7,13 +7,14 @@
 #include "dialogsettings.h"
 #include "dialoggotoword.h"
 #include "dialogconfirmdelete.h"
+#include "modelidioms.h"
+#include "tableidioms.h"
 
 #include <QMainWindow>
 #include <QWebEngineView>
 #include <QMenuBar>
 #include <QVBoxLayout>
 #include <QScrollArea>
-
 #include <QtSql>
 #include <QTableView>
 #include <QListWidget>
@@ -22,6 +23,7 @@
 #include <QThread>
 #include <QStatusBar>
 #include <QDockWidget>
+#include <QToolBar>
 
 
 class WordCount : public QThread
@@ -63,6 +65,10 @@ private:
   QAction actionUndefined;
   QAction actionGotoWord;
   QAction actionDeleteRecord;
+  QAction actionNextTab;
+  QAction actionPrevTab;
+
+  QToolBar toolBar;
 
   QActionGroup *actionsLanguages;
   QList<QAction*> languages;
@@ -70,10 +76,15 @@ private:
   QScrollArea centralScroll;
   QWidget centreWidget;
   QGridLayout glCentralGrid;
+  QTabWidget tabWidget;
 
   ModelView modelView;
   CustomModel *modelWords;
   CustomTableView *tableWords;
+  ModelIdioms modelIdioms;
+  TableIdioms tableIdioms;
+  QSqlTableModel *currentModel;
+  QTableView *currentView;
 
   DialogAddWord *dialogAddWord;
   DialogFilter *dialogfilterWord;
@@ -94,7 +105,7 @@ private:
 
   int row = 1;
   int col = 0;
-  int currentViews = 0;
+  int currentWebViews = 0;
 
   void webSearchWord(const QString &word);
   void clearBrowsers();
@@ -106,7 +117,7 @@ private slots:
   void resizeRowsColumns();
   void onSelectionChanged(const QItemSelection &selected,
                           const QItemSelection &deselected);
-  void openAddWordsWindow();
+  void propagateTabIndex(int index);
   void onMasteredToggle(const bool &b);
   void onUnmasteredToggle(const bool &b);
   void onDefinedToggle(const bool &b);
@@ -120,6 +131,7 @@ private slots:
   void toggleStatusBar(bool ok);
   void updateModel();
   void actionLanguage(const QAction *action);
+  void onChangeTabKey();
 };
 
 #endif // MAINWINDOW_H

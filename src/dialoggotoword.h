@@ -7,6 +7,8 @@
 #include <QPushButton>
 #include <QLabel>
 #include <QHideEvent>
+#include <QSqlTableModel>
+#include <QTableView>
 
 class DialogGotoWord : public QDialog
 {
@@ -15,12 +17,19 @@ class DialogGotoWord : public QDialog
 public:
   DialogGotoWord(QWidget *parent = nullptr);
 
+  void onTabChange(QSqlTableModel *model, QTableView *view, int currentTab);
 private:
   QGridLayout glfilterWord;
   QLineEdit leWord;
   QPushButton pbGotoWord;
   QPushButton pbClose;
   QLabel lbNotFound;
+
+  QSqlTableModel *model;
+  QTableView *view;
+
+  int currentTab;
+  int recordCount;
 
   void setupWidgets();
   void setupLayout();

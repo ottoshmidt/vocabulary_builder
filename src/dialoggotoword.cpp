@@ -12,11 +12,21 @@ DialogGotoWord::DialogGotoWord(QWidget *parent)
   setMinimumSize(340, 130);
 
   setupWidgets();
-
   setupLayout();
+
+  recordCount = 0;
 
   connect(&pbGotoWord, &QPushButton::released, this, &DialogGotoWord::onGoPress);
   connect(&pbClose, &QPushButton::released, this, &QDialog::close);
+}
+
+void DialogGotoWord::onTabChange(QSqlTableModel *model, QTableView *view,
+                                 int currentTab)
+{
+  this->model = model;
+  this->view = view;
+  this->currentTab = currentTab;
+  recordCount = 0;
 }
 
 void DialogGotoWord::setupWidgets()
@@ -49,33 +59,56 @@ void DialogGotoWord::hideEvent(QHideEvent *event)
 
 void DialogGotoWord::gotoWord(const QString &word)
 {
-  int i = 0;
+  if (word.isEmpty())
+    return;
+
+  view->setCurrentIndex(model->index(0, 0));
+
   bool found = false;
+  int startingPoint = recordCount;
 
-  QSqlRecord rec = ModelView::model()->record(0);
+  QSqlRecord rec = model->record(recordCount);
 
-  while(!rec.isNull("word"))
+  QString colName;
+  if (!currentTab)
+    colName = "word";
+  else
+    colName = "idiom";
+
+  while(!rec.isNull(colName))
   {
-    QString w = rec.value("word").toString();
+    QString w = rec.value(colName).toString();
 
-    if(w == word)
+    if(w.contains(word))
     {
-      ModelView::view()->setCurrentIndex(ModelView::model()->index(i, 0));
-      ModelView::model()->selectRow(i);
+      view->setCurrentIndex(model->index(recordCount, 0));
 
       found = true;
       lbNotFound.clear();
+      recordCount++;
 
       break;
     }
 
-    rec = ModelView::model()->record(++i);
+    rec = model->record(++recordCount);
+
+    // Continue from the beginning
+    if (rec.isNull(colName) && startingPoint > 0)
+    {
+      recordCount = 0;
+      startingPoint = 0;
+      rec = model->record(recordCount);
+    }
   }
 
   QString txt = "Word '" + word + "' not found";
 
   if(!found)
+  {
     lbNotFound.setText(tr(txt.toStdString().c_str()));
+    view->setCurrentIndex(model->index(-1, -1));
+    recordCount = 0;
+  }
 }
 
 void DialogGotoWord::onGoPress()

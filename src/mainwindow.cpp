@@ -2,18 +2,18 @@
 #include "database.h"
 
 #include <QMessageBox>
-
 #include <QCheckBox>
 #include <QScrollBar>
 #include <QStatusBar>
 
-//TODO: BUG: Enter a misspelled word, then correct it but that correct word is already contained in the dict. Action?
+//TODO: BUG: Enter a misspelled word, then correct it but that correct word is
+//      already contained in the dict. Action?
 //TODO: BUG: when sorted by name and add new word, problems with appearing that word.
-//TODO: Idiom support
 
 //TODO: Dark theme
 //TODO: Reflect website modifications in settings in already loaded programme
-//TODO: Ability to save database in another location (Share drive, Dropbox, etc.). Would need to save settings in .config dir
+//TODO: Ability to save database in another location (Share drive, Dropbox, etc.).
+//      Would need to save settings in .config dir
 //TODO: Db file export/import
 //TODO: Delete word on right-click and del button
 //TODO: check if we can set mastered checkbox in the middle automatically
@@ -33,11 +33,8 @@ MainWindow::MainWindow(QWidget *parent) :
   setWindowIcon(QIcon(":icons/books.ico"));
 
   setupDialogs();
-
   setupModelView();
-
   setupCentralGrid();
-
   setupMenus();
 }
 
@@ -64,6 +61,7 @@ void MainWindow::setupDialogs()
 
 void MainWindow::setupModelView()
 {
+  // To run the ModelView constructor (don't remove)
   modelView.setParent(this);
 
   tableWords = ModelView::view();
@@ -79,6 +77,14 @@ void MainWindow::setupModelView()
 
   connect(modelWords, &QSqlTableModel::beforeUpdate, this,
           &MainWindow::onBeforeUpdate);
+
+  modelIdioms.setParent(this);
+  tableIdioms.setParent(this);
+  tableIdioms.setModel(&modelIdioms);
+  tableIdioms.hideColumn(5);
+
+  connect(&tableIdioms, &TableIdioms::selectionChangedSig, this,
+          &MainWindow::onSelectionChanged);
 }
 
 void MainWindow::setupCentralGrid()
@@ -90,7 +96,9 @@ void MainWindow::setupCentralGrid()
 
   setCentralWidget(&centralScroll);
 
-  glCentralGrid.addWidget(tableWords, 0, 0, 1, 2);
+  tabWidget.addTab(tableWords, "Words");
+  tabWidget.addTab(&tableIdioms, "Idioms");
+  glCentralGrid.addWidget(&tabWidget, 0, 0, 1, 2);
 
   updateUrls();
   addWebViews();
@@ -101,6 +109,17 @@ void MainWindow::setupCentralGrid()
   setStatusBar(statBar);
   threadWordCount->start();
   toggleStatusBar(showStatusBar);
+
+  propagateTabIndex(tabWidget.currentIndex());
+  connect(&tabWidget, &QTabWidget::currentChanged, this,
+          &MainWindow::propagateTabIndex);
+
+  actionNextTab.setShortcut(Qt::CTRL + Qt::Key_PageDown);
+  connect(&actionNextTab, &QAction::triggered, this, &MainWindow::onChangeTabKey);
+  addAction(&actionNextTab);
+  actionPrevTab.setShortcut(Qt::CTRL + Qt::Key_PageUp);
+  connect(&actionPrevTab, &QAction::triggered, this, &MainWindow::onChangeTabKey);
+  addAction(&actionPrevTab);
 }
 
 void MainWindow::setupMenus()
@@ -163,13 +182,14 @@ void MainWindow::setupMenus()
   addShortcuts.append(Qt::CTRL + Qt::Key_N);
   actionAddWord.setShortcuts(addShortcuts);
   actionAddWord.setIcon(QIcon(":/icons/new.ico"));
-  connect(&actionAddWord, &QAction::triggered, dialogAddWord, &QDialog::show);
+  connect(&actionAddWord, &QAction::triggered, dialogAddWord, &QDialog::open);
   menuWords.addAction(&actionAddWord);
 
   actionRefresh.setText(tr("&Refresh"));
   actionRefresh.setShortcut(QKeySequence(Qt::CTRL + Qt::Key_R));
   actionRefresh.setIcon(QIcon(":/icons/refresh.ico"));
-  connect(&actionRefresh, &QAction::triggered, modelWords, &QSqlTableModel::select);
+  connect(&actionRefresh, &QAction::triggered, currentModel,
+          &QSqlTableModel::select);
   menuWords.addAction(&actionRefresh);
 
   menuWords.addSeparator();
@@ -227,7 +247,8 @@ void MainWindow::setupMenus()
   actionDeleteRecord.setShortcut(QKeySequence::Delete);
   actionDeleteRecord.setIcon(QIcon(":/icons/delete.ico"));
   actionDeleteRecord.setEnabled(false);
-  connect(&actionDeleteRecord, &QAction::triggered, this, &MainWindow::confirmDeleteItem);
+  connect(&actionDeleteRecord, &QAction::triggered, this,
+          &MainWindow::confirmDeleteItem);
   menuWords.addAction(&actionDeleteRecord);
 
   menuBar()->addMenu(&menuWords);
@@ -252,7 +273,7 @@ void MainWindow::updateUrls()
 
 void MainWindow::addWebViews()
 {
-  for(int i = 0; i < urls.count() - currentViews; i++)
+  for(int i = 0; i < urls.count() - currentWebViews; i++)
   {
     auto *webView = new QWebEngineView(&centreWidget);
 
@@ -273,8 +294,8 @@ void MainWindow::addWebViews()
     }
   }
 
-  if (urls.count() > currentViews)
-    currentViews = urls.count();
+  if (urls.count() > currentWebViews)
+    currentWebViews = urls.count();
 }
 
 void MainWindow::webSearchWord(const QString &word)
@@ -297,7 +318,7 @@ void MainWindow::resizeEvent(QResizeEvent *event)
 {
   QMainWindow::resizeEvent(event);
 
-  double height = static_cast<double>(this->height()) * 0.46;
+  double height = static_cast<double>(this->height()) * 0.5;
 
   tableWords->setMinimumHeight(static_cast<int>(height));
 
@@ -344,9 +365,9 @@ void MainWindow::onSelectionChanged(const QItemSelection &selected,
                                      previndices[0].column() != 1)) &&
        indices[0].column() == 1)
     {
-      QModelIndex i = modelWords->index(indices[0].row(), 1);
+      QModelIndex i = currentModel->index(indices[0].row(), 1);
 
-      webSearchWord(modelWords->data(i).toString());
+      webSearchWord(currentModel->data(i).toString());
     }
 
     actionDeleteRecord.setEnabled(true);
@@ -357,9 +378,25 @@ void MainWindow::onSelectionChanged(const QItemSelection &selected,
   }
 }
 
-void MainWindow::openAddWordsWindow()
+void MainWindow::propagateTabIndex(int index)
 {
-  dialogAddWord->show();
+  dialogAddWord->setCurrentTab(index);
+
+  if (!index)
+  {
+    currentModel = modelWords;
+    currentView = tableWords;
+
+    dialogGotoWord->onTabChange(modelWords, tableWords, index);
+    dialogfilterWord->onTabChange(modelWords, tableWords, index);
+  }
+  else {
+    currentModel = &modelIdioms;
+    currentView = &tableIdioms;
+
+    dialogGotoWord->onTabChange(&modelIdioms, &tableIdioms, index);
+    dialogfilterWord->onTabChange(&modelIdioms, &tableIdioms, index);
+  }
 }
 
 void MainWindow::onMasteredToggle(const bool &b)
@@ -419,14 +456,19 @@ void MainWindow::applyFilter()
   else
     filterStr = "";
 
+  if (!filterStr.isEmpty())
+    filterStr += " and ";
+  filterStr += "language_fk = " + QString::number(
+                  DataBase::getSetting("current_language"));
+
   modelWords->setFilter(filterStr);
 }
 
 void MainWindow::confirmDeleteItem()
 {
-  int r = tableWords->currentIndex().row();
-  QModelIndex i = modelWords->index(r, 1);
-  QString word = modelWords->data(i).toString();
+  int r = currentView->currentIndex().row();
+  QModelIndex idx = currentModel->index(r, 1);
+  QString word = currentModel->data(idx).toString();
 
   if(confirmDelete)
   {
@@ -445,8 +487,8 @@ void MainWindow::confirmDeleteItem()
 
 void MainWindow::deleteRecord(int row)
 {
-  modelWords->removeRow(row);
-  modelWords->select();
+  currentModel->removeRow(row);
+  currentModel->select();
 
   if(statusBar()->isVisible())
     updateWordCount();
@@ -454,13 +496,20 @@ void MainWindow::deleteRecord(int row)
 
 void MainWindow::updateWordCount()
 {
-  threadWordCount->start();
+  if (!tabWidget.currentIndex())
+    threadWordCount->start();
+
+  updateModel();
 }
 
 void MainWindow::onBeforeUpdate(int row, QSqlRecord &record)
 {
   Q_UNUSED(row)
-  Q_UNUSED(record)
+
+  QString dateTime = QDateTime::currentDateTime().toString("yyyy-MM-dd hh:mm:ss");
+
+  record.setValue("updatetime", dateTime);
+  record.setGenerated("updatetime", true);
 
   threadWordCount->start();
 }
@@ -484,7 +533,10 @@ void MainWindow::toggleStatusBar(bool ok)
 
 void MainWindow::updateModel()
 {
-  modelWords->select();
+  if (tabWidget.currentIndex())
+    modelIdioms.select();
+  else
+    modelWords->select();
 }
 
 void MainWindow::actionLanguage(const QAction *action)
@@ -504,11 +556,16 @@ void MainWindow::actionLanguage(const QAction *action)
 
     DataBase::updateSetting("current_language", languageID);
     modelWords->setFilter("language_fk = " + QString::number(languageID));
-
+    modelIdioms.setFilter("language_fk = " + QString::number(languageID));
 
     updateUrls();
     addWebViews();
   }
+}
+
+void MainWindow::onChangeTabKey()
+{
+  tabWidget.setCurrentIndex(!tabWidget.currentIndex());
 }
 
 void WordCount::run()
@@ -555,7 +612,6 @@ void WordCount::run()
   statList.append(QString::number(mastered));
   statList.append("   Unmastered:");
   statList.append(QString::number(unmastered));
-
 
   bar->setText(statList.join(' '));
 }

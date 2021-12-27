@@ -31,12 +31,14 @@ SOURCES += \
     checkboxdelegate.cpp \
     customtableview.cpp \
     database.cpp \
+    modelidioms.cpp \
     modelview.cpp \
     dialoggotoword.cpp \
     dialogaddword.cpp \
     dialogsettings.cpp \
     dialogfilter.cpp \
-    dialogconfirmdelete.cpp
+    dialogconfirmdelete.cpp \
+    tableidioms.cpp
 
 HEADERS += \
         mainwindow.h \
@@ -44,12 +46,14 @@ HEADERS += \
     checkboxdelegate.h \
     customtableview.h \
     database.h \
+    modelidioms.h \
     modelview.h \
     dialoggotoword.h \
     dialogaddword.h \
     dialogsettings.h \
     dialogfilter.h \
-    dialogconfirmdelete.h
+    dialogconfirmdelete.h \
+    tableidioms.h
 
 FORMS +=
 

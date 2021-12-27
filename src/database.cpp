@@ -54,31 +54,26 @@ void DataBase::createTables()
 
   if(!query.exec("CREATE TABLE languages(id INTEGER primary key autoincrement, "
                  "language varchar(20))"))
-    QMessageBox::critical(nullptr, dbErrorStr,
-                          query.lastError().text());
+    QMessageBox::critical(nullptr, dbErrorStr, query.lastError().text());
 
   if(!query.exec("INSERT INTO languages(id, language) VALUES(1, 'English')"))
-    QMessageBox::critical(nullptr, dbErrorStr,
-                          query.lastError().text());
+    QMessageBox::critical(nullptr, dbErrorStr, query.lastError().text());
 
   if(!query.exec("CREATE TABLE urls(id integer primary key autoincrement, "
                  "url varchar(100) unique, enabled int(1), language_fk integer, "
                  "foreign key (language_fk) references languages(id))"))
-    QMessageBox::critical(nullptr, dbErrorStr,
-                          query.lastError().text());
+    QMessageBox::critical(nullptr, dbErrorStr, query.lastError().text());
 
   if(!query.exec("INSERT INTO urls(url, enabled, language_fk) "
                  "VALUES('https://www.merriam-webster.com/dictionary/{word}', 1, 1),"
                  "('https://en.oxforddictionaries.com/definition/{word}', 1, 1),"
                  "('https://www.google.ge/search?q={word}&tbm=isch', 1, 1),"
                  "('https://en.wikipedia.org/wiki/{word}', 1, 1)"))
-    QMessageBox::critical(nullptr, dbErrorStr,
-                          query.lastError().text());
+    QMessageBox::critical(nullptr, dbErrorStr, query.lastError().text());
 
   if(!query.exec("CREATE TABLE settings(id integer primary key autoincrement, "
                  "key varchar(40), value int, value_str varchar(25))"))
-    QMessageBox::critical(nullptr, dbErrorStr,
-                          query.lastError().text());
+    QMessageBox::critical(nullptr, dbErrorStr, query.lastError().text());
 
   if(!query.exec("INSERT INTO settings (key, value) "
                  "VALUES"
@@ -89,8 +84,7 @@ void DataBase::createTables()
                  "('confirm_delete', 1),"
                  "('status_bar', 1)"
                  ))
-    QMessageBox::critical(nullptr, dbErrorStr,
-                          query.lastError().text());
+    QMessageBox::critical(nullptr, dbErrorStr, query.lastError().text());
 }
 
 QSqlDatabase DataBase::getDb()

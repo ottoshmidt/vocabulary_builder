@@ -1,7 +1,5 @@
 #include "dialogaddword.h"
 #include "database.h"
-#include "modelview.h"
-
 #include <QDebug>
 #include <QSqlDatabase>
 #include <QSqlQuery>
@@ -42,6 +40,11 @@ void DialogAddWord::hideEvent(QHideEvent *event)
   leWord.setFocus();
 
   event->accept();
+}
+
+void DialogAddWord::setCurrentTab(int currentTab)
+{
+  this->currentTab = currentTab;
 }
 
 void DialogAddWord::addWord()
@@ -97,22 +100,27 @@ void DialogAddWord::addWord()
   }
   else
   {
-    query.prepare("INSERT INTO words(word, rating, language_fk) values(?,?,?)");
+    QString tableStr;
+    if (!currentTab)
+      tableStr = "words(word";
+    else
+      tableStr = "idioms(idiom";
+
+    query.prepare("INSERT INTO "+tableStr+", rating, language_fk) values(?,?,?)");
     query.addBindValue(word);
     query.addBindValue(1);
     query.addBindValue(DataBase::getSetting("current_language"));
 
-    if(!query.exec())
-    {
-      QMessageBox::critical(nullptr, "Database Error", query.lastError().text());
-    }
-    else
+    if(query.exec())
     {
       lbResult.setText("Word '" + word + "' added. Rating: 1");
 
-      ModelView::model()->select();
-
       emit wordInserted();
+    }
+    else
+    {
+      QMessageBox::critical(nullptr, "Database Error", query.lastError().text());
+
     }
   }
 
