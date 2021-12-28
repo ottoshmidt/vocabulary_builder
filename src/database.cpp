@@ -43,17 +43,27 @@ void DataBase::createTables()
 
   QString dbErrorStr = tr("Database Error while creating tables.");
 
-  if(!query.exec("CREATE TABLE words(id integer primary key autoincrement,"
-                 "word varchar(30) unique, note varchar(10), pronunciation "
-                 "varchar(35),definition varchar(150), rating int, mastered "
-                 "int(1) default 0, "
-                 "updatetime date default (datetime('now','localtime'))),"
-                 "createtime date default (datetime('now','localtime')))"))
+  if(!query.exec("CREATE TABLE words(id integer primary key autoincrement, "
+                 "word varchar(30) unique, note varchar(10), "
+                 "pronunciation varchar(35),definition varchar(150), rating int, "
+                 "mastered int(1) default 0, language_fk integer, "
+                 "updatetime date default (datetime('now','localtime')), "
+                 "createtime date default (datetime('now','localtime')), "
+                 "foreign key (language_fk) references languages(id));"))
+    QMessageBox::critical(nullptr, dbErrorStr,
+                          query.lastError().text());
+
+  if(!query.exec("CREATE TABLE idioms(id integer primary key autoincrement, "
+                 "idiom varchar(50) unique, definition varchar(150), rating int, "
+                 "mastered int(1) default 0, language_fk integer, "
+                 "updatetime date default (datetime('now','localtime')), "
+                 "createtime date default (datetime('now','localtime')), "
+                 "foreign key (language_fk) references languages(id));"))
     QMessageBox::critical(nullptr, dbErrorStr,
                           query.lastError().text());
 
   if(!query.exec("CREATE TABLE languages(id INTEGER primary key autoincrement, "
-                 "language varchar(20))"))
+                 "language varchar(20) NOT NULL UNIQUE);"))
     QMessageBox::critical(nullptr, dbErrorStr, query.lastError().text());
 
   if(!query.exec("INSERT INTO languages(id, language) VALUES(1, 'English')"))
@@ -61,7 +71,7 @@ void DataBase::createTables()
 
   if(!query.exec("CREATE TABLE urls(id integer primary key autoincrement, "
                  "url varchar(100) unique, enabled int(1), language_fk integer, "
-                 "foreign key (language_fk) references languages(id))"))
+                 "foreign key (language_fk) references languages(id));"))
     QMessageBox::critical(nullptr, dbErrorStr, query.lastError().text());
 
   if(!query.exec("INSERT INTO urls(url, enabled, language_fk) "
@@ -72,7 +82,7 @@ void DataBase::createTables()
     QMessageBox::critical(nullptr, dbErrorStr, query.lastError().text());
 
   if(!query.exec("CREATE TABLE settings(id integer primary key autoincrement, "
-                 "key varchar(40), value int, value_str varchar(25))"))
+                 "key varchar(40), value int, value_str varchar(25));"))
     QMessageBox::critical(nullptr, dbErrorStr, query.lastError().text());
 
   if(!query.exec("INSERT INTO settings (key, value) "
@@ -83,6 +93,7 @@ void DataBase::createTables()
                  "('exactmatch', 0),"
                  "('confirm_delete', 1),"
                  "('status_bar', 1)"
+                 "('current_language', 1)"
                  ))
     QMessageBox::critical(nullptr, dbErrorStr, query.lastError().text());
 }
