@@ -111,7 +111,6 @@ private:
   void clearBrowsers();
 
   void resizeEvent(QResizeEvent *event) override;
-  void showEvent(QShowEvent *event) override;
 
 private slots:
   void resizeRowsColumns();

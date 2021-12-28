@@ -12,30 +12,33 @@ DialogAddWord::DialogAddWord(QWidget *parent)
   setParent(parent);
   setWindowFlags(Qt::Dialog);
 
-  setWindowTitle("Add New Word");
+  setWindowTitle(tr("Add New Word"));
   setMinimumSize(400, 140);
 
-  pbAddWord.setText("Add Word");
-  pbCloseWindow.setText("Close");
+  pbAddWord.setText(tr("Add Word"));
+  pbClose.setText(tr("Close"));
 
   gridLayout.addWidget(&leWord, 0, 0, 1, 3);
   gridLayout.addWidget(&lbResult, 1, 0, 1, 2);
+  gridLayout.addWidget(&lbGoToWord, 1, 2);
   gridLayout.addWidget(&pbAddWord, 3, 1);
-  gridLayout.addWidget(&pbCloseWindow, 3, 2);
+  gridLayout.addWidget(&pbClose, 3, 2);
   gridLayout.setRowStretch(2, 1);
   gridLayout.setColumnStretch(0, 1);
   gridLayout.setSpacing(3);
 
   setLayout(&gridLayout);
 
-  connect(&pbCloseWindow, &QPushButton::released, this, &QWidget::close);
+  connect(&pbClose, &QPushButton::released, this, &QWidget::close);
   connect(&pbAddWord, &QPushButton::released, this, &DialogAddWord::addWord);
+  connect(&lbGoToWord, &QLabel::linkActivated, this, &DialogAddWord::gotoWord);
 }
 
 void DialogAddWord::hideEvent(QHideEvent *event)
 {
   leWord.clear();
   lbResult.clear();
+  lbGoToWord.clear();
 
   leWord.setFocus();
 
@@ -81,11 +84,7 @@ void DialogAddWord::addWord()
     query.addBindValue(++rating);
     query.addBindValue(word);
 
-    if(!query.exec())
-    {
-      QMessageBox::critical(nullptr, "Database Error", query.lastError().text());
-    }
-    else
+    if(query.exec())
     {
       QString defined = "Undefined";
 
@@ -95,7 +94,13 @@ void DialogAddWord::addWord()
       lbResult.setText("Word '" + word + "' exists! (" + defined + ") Rating: " +
                        QString::number(rating));
 
+      lbGoToWord.setText("<a href=\""+ word +"\">Go to word</a>");
+
       emit wordUpdated();
+    }
+    else
+    {
+      QMessageBox::critical(nullptr, "Database Error", query.lastError().text());
     }
   }
   else
@@ -115,14 +120,20 @@ void DialogAddWord::addWord()
     {
       lbResult.setText("Word '" + word + "' added. Rating: 1");
 
+      lbGoToWord.clear();
+
       emit wordInserted();
     }
     else
     {
       QMessageBox::critical(nullptr, "Database Error", query.lastError().text());
-
     }
   }
 
   leWord.clear();
+}
+
+void DialogAddWord::gotoWord(const QString &word)
+{
+  emit linkClicked(word);
 }

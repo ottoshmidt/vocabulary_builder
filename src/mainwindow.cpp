@@ -49,6 +49,9 @@ void MainWindow::setupDialogs()
   connect(dialogAddWord, &DialogAddWord::wordInserted, this,
           &MainWindow::updateWordCount);
 
+  connect(dialogAddWord, &DialogAddWord::linkClicked, dialogGotoWord,
+          &DialogGotoWord::gotoWord);
+
   connect(dialogAddWord, &DialogAddWord::wordUpdated, this,
           &MainWindow::updateModel);
 
@@ -326,18 +329,6 @@ void MainWindow::resizeEvent(QResizeEvent *event)
   double posY = static_cast<double>(this->height()) * 0.5;
 
   dialogAddWord->move(static_cast<int>(posX), static_cast<int>(posY));
-}
-
-void MainWindow::showEvent(QShowEvent *event)
-{
-  QMainWindow::showEvent(event);
-
-  if (dialogAddWord->isVisible())
-    dialogAddWord->raise();
-  else if (dialogGotoWord->isVisible())
-    dialogGotoWord->raise();
-  else if (dialogfilterWord->isVisible())
-    dialogfilterWord->raise();
 }
 
 void MainWindow::resizeRowsColumns()

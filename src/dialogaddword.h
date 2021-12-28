@@ -20,9 +20,10 @@ public:
 private:
   QLineEdit leWord;
   QLabel lbResult;
+  QLabel lbGoToWord;
   QGridLayout gridLayout;
   QPushButton pbAddWord;
-  QPushButton pbCloseWindow;
+  QPushButton pbClose;
 
   int currentTab;
 
@@ -31,10 +32,12 @@ private:
 
 private slots:
   void addWord();
+  void gotoWord(const QString &word);
 
 signals:
   void wordInserted();
   void wordUpdated();
+  void linkClicked(QString word);
 };
 
 #endif // ADDWORD_H
