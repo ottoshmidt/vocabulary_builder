@@ -70,7 +70,7 @@ void DataBase::createTables()
     QMessageBox::critical(nullptr, dbErrorStr, query.lastError().text());
 
   if(!query.exec("CREATE TABLE urls(id integer primary key autoincrement, "
-                 "url varchar(100) unique, enabled int(1), language_fk integer, "
+                 "url varchar(100), enabled int(1), language_fk integer, "
                  "foreign key (language_fk) references languages(id));"))
     QMessageBox::critical(nullptr, dbErrorStr, query.lastError().text());
 
