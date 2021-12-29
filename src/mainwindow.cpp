@@ -551,6 +551,8 @@ void MainWindow::actionLanguage(const QAction *action)
 
     updateUrls();
     addWebViews();
+
+    threadWordCount->start();
   }
 }
 
@@ -571,19 +573,30 @@ void WordCount::run()
 
   QSqlQuery query(DataBase::getDb());
 
-  if(!query.exec("select count(1) from words"))
+  query.prepare("select count(1) from words where language_fk = ?");
+  query.addBindValue(DataBase::getSetting("current_language"));
+
+  if(!query.exec())
     QMessageBox::critical(nullptr, "Database Error", query.lastError().text());
 
   while(query.next())
     words = query.value(0).toInt();
 
-  if(!query.exec("select count(1) from words where definition != ''"))
+  query.prepare("select count(1) from words where language_fk = ? and "
+                "definition != ''");
+  query.addBindValue(DataBase::getSetting("current_language"));
+
+  if(!query.exec())
     QMessageBox::critical(nullptr, "Database Error", query.lastError().text());
 
   while(query.next())
     defined = query.value(0).toInt();
 
-  if(!query.exec("select count(1) from words where mastered = 1"))
+  query.prepare("select count(1) from words where language_fk = ? and "
+                "mastered = 1");
+  query.addBindValue(DataBase::getSetting("current_language"));
+
+  if(!query.exec())
     QMessageBox::critical(nullptr, "Database Error", query.lastError().text());
 
   while(query.next())
