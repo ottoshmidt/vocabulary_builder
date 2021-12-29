@@ -119,10 +119,18 @@ void MainWindow::setupCentralGrid()
 
   actionNextTab.setShortcut(Qt::CTRL + Qt::Key_PageDown);
   connect(&actionNextTab, &QAction::triggered, this, &MainWindow::onChangeTabKey);
-  addAction(&actionNextTab);
   actionPrevTab.setShortcut(Qt::CTRL + Qt::Key_PageUp);
   connect(&actionPrevTab, &QAction::triggered, this, &MainWindow::onChangeTabKey);
+  actionNextLanguage.setShortcut(Qt::CTRL + Qt::Key_L);
+  connect(&actionNextLanguage, &QAction::triggered, this,
+          &MainWindow::onNextLanguage);
+  actionPrevLanguage.setShortcut(Qt::CTRL + Qt::SHIFT + Qt::Key_L);
+  connect(&actionPrevLanguage, &QAction::triggered, this,
+          &MainWindow::onPrevLanguage);
+  addAction(&actionNextTab);
   addAction(&actionPrevTab);
+  addAction(&actionNextLanguage);
+  addAction(&actionPrevLanguage);
 }
 
 void MainWindow::setupMenus()
@@ -149,7 +157,10 @@ void MainWindow::setupMenus()
     languages.append(new QAction(query.value(1).toString(), actionsLanguages));
 
     if (DataBase::getSetting("current_language") == query.value(0).toInt())
+    {
       languages.last()->setChecked(true);
+      currentLanguage = languages.last();
+    }
   }
 
   actionsLanguages->setExclusive(true);
@@ -553,12 +564,48 @@ void MainWindow::actionLanguage(const QAction *action)
     addWebViews();
 
     threadWordCount->start();
+
+    currentLanguage = const_cast<QAction*>(action);
   }
 }
 
 void MainWindow::onChangeTabKey()
 {
   tabWidget.setCurrentIndex(!tabWidget.currentIndex());
+}
+
+void MainWindow::onNextLanguage()
+{
+  for (auto i = languages.begin(); i != languages.end(); ++i)
+  {
+    auto next = i + 1;
+
+    if ((*i) == currentLanguage && next != languages.end())
+    {
+      (*next)->trigger();
+
+      return;
+    }
+  }
+
+  languages.first()->trigger();
+}
+
+void MainWindow::onPrevLanguage()
+{
+  for (auto i = languages.end() - 1; i != languages.begin() - 1; --i)
+  {
+    auto prev = i - 1;
+
+    if ((*i) == currentLanguage && prev != languages.begin() - 1)
+    {
+      (*prev)->trigger();
+
+      return;
+    }
+  }
+
+  languages.last()->trigger();
 }
 
 void WordCount::run()

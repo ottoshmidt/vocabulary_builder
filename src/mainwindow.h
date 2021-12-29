@@ -67,11 +67,14 @@ private:
   QAction actionDeleteRecord;
   QAction actionNextTab;
   QAction actionPrevTab;
+  QAction actionNextLanguage;
+  QAction actionPrevLanguage;
 
   QToolBar toolBar;
 
   QActionGroup *actionsLanguages;
   QList<QAction*> languages;
+  QAction *currentLanguage;
 
   QScrollArea centralScroll;
   QWidget centreWidget;
@@ -131,6 +134,8 @@ private slots:
   void updateModel();
   void actionLanguage(const QAction *action);
   void onChangeTabKey();
+  void onNextLanguage();
+  void onPrevLanguage();
 };
 
 #endif // MAINWINDOW_H
