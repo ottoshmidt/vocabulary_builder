@@ -185,7 +185,7 @@ void MainWindow::setupMenus()
   addShortcuts.append(Qt::CTRL + Qt::Key_N);
   actionAddWord.setShortcuts(addShortcuts);
   actionAddWord.setIcon(QIcon(":/icons/new.ico"));
-  connect(&actionAddWord, &QAction::triggered, dialogAddWord, &QDialog::open);
+  connect(&actionAddWord, &QAction::triggered, dialogAddWord, &QDialog::show);
   menuWords.addAction(&actionAddWord);
 
   actionRefresh.setText(tr("&Refresh"));
