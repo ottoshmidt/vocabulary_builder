@@ -50,7 +50,7 @@ void DataBase::createTables()
                  "updatetime date default (datetime('now','localtime')), "
                  "createtime date default (datetime('now','localtime')), "
                  "foreign key (language_fk) references languages(id));"))
-    QMessageBox::critical(nullptr, dbErrorStr,
+    QMessageBox::critical(nullptr, dbErrorStr + " (words)",
                           query.lastError().text());
 
   if(!query.exec("CREATE TABLE idioms(id integer primary key autoincrement, "
@@ -59,31 +59,36 @@ void DataBase::createTables()
                  "updatetime date default (datetime('now','localtime')), "
                  "createtime date default (datetime('now','localtime')), "
                  "foreign key (language_fk) references languages(id));"))
-    QMessageBox::critical(nullptr, dbErrorStr,
+    QMessageBox::critical(nullptr, dbErrorStr + " (idioms)",
                           query.lastError().text());
 
   if(!query.exec("CREATE TABLE languages(id INTEGER primary key autoincrement, "
                  "language varchar(20) NOT NULL UNIQUE);"))
-    QMessageBox::critical(nullptr, dbErrorStr, query.lastError().text());
+    QMessageBox::critical(nullptr, dbErrorStr + " (languages)",
+                          query.lastError().text());
 
   if(!query.exec("INSERT INTO languages(id, language) VALUES(1, 'English')"))
-    QMessageBox::critical(nullptr, dbErrorStr, query.lastError().text());
+    QMessageBox::critical(nullptr, "insert into languages",
+                          query.lastError().text());
 
   if(!query.exec("CREATE TABLE urls(id integer primary key autoincrement, "
                  "url varchar(100), enabled int(1), language_fk integer, "
                  "foreign key (language_fk) references languages(id));"))
-    QMessageBox::critical(nullptr, dbErrorStr, query.lastError().text());
+    QMessageBox::critical(nullptr, dbErrorStr + " (urls)",
+                          query.lastError().text());
 
   if(!query.exec("INSERT INTO urls(url, enabled, language_fk) "
                  "VALUES('https://www.merriam-webster.com/dictionary/{word}', 1, 1),"
                  "('https://en.oxforddictionaries.com/definition/{word}', 1, 1),"
                  "('https://www.google.ge/search?q={word}&tbm=isch', 1, 1),"
                  "('https://en.wikipedia.org/wiki/{word}', 1, 1)"))
-    QMessageBox::critical(nullptr, dbErrorStr, query.lastError().text());
+    QMessageBox::critical(nullptr, "insert into urls",
+                          query.lastError().text());
 
   if(!query.exec("CREATE TABLE settings(id integer primary key autoincrement, "
                  "key varchar(40), value int, value_str varchar(25));"))
-    QMessageBox::critical(nullptr, dbErrorStr, query.lastError().text());
+    QMessageBox::critical(nullptr, dbErrorStr + " (settings)",
+                          query.lastError().text());
 
   if(!query.exec("INSERT INTO settings (key, value) "
                  "VALUES"
@@ -92,10 +97,11 @@ void DataBase::createTables()
                  "('indefinitions', 0),"
                  "('exactmatch', 0),"
                  "('confirm_delete', 1),"
-                 "('status_bar', 1)"
+                 "('status_bar', 1),"
                  "('current_language', 1)"
                  ))
-    QMessageBox::critical(nullptr, dbErrorStr, query.lastError().text());
+    QMessageBox::critical(nullptr, "insert into settings",
+                          query.lastError().text());
 }
 
 QSqlDatabase DataBase::getDb()
