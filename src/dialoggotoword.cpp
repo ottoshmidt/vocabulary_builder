@@ -79,7 +79,7 @@ void DialogGotoWord::gotoWord(const QString &word)
   {
     QString w = rec.value(colName).toString();
 
-    if(w.contains(word))
+    if(w.contains(word.toLower()))
     {
       view->setCurrentIndex(model->index(recordCount, 0));
 
