@@ -136,6 +136,7 @@ private slots:
   void onChangeTabKey();
   void onNextLanguage();
   void onPrevLanguage();
+  void enaGeInput(bool ok);
 };
 
 #endif // MAINWINDOW_H

@@ -23,6 +23,9 @@
 bool showStatusBar;
 bool confirmDelete;
 
+QWebEngineView *senderWebView = nullptr;
+QString searchWord = "";
+
 MainWindow::MainWindow(QWidget *parent) :
   QMainWindow(parent)
 {
@@ -316,11 +319,29 @@ void MainWindow::addWebViews()
 
 void MainWindow::webSearchWord(const QString &word)
 {
+  if (senderWebView)
+  {
+    disconnect(senderWebView, &QWebEngineView::loadFinished, this,
+               &MainWindow::enaGeInput);
+    searchWord = "";
+  }
+
   QString url;
   for(int i = 0; i < urls.size(); i++)
   {
     url = urls[i];
-    webViewList.at(i)->setUrl(QUrl(url.replace("{word}", word)));
+
+    auto webView = webViewList.at(i);
+
+    if (url.contains("ena.ge"))
+    {
+      senderWebView = webView;
+      searchWord = word;
+      connect(senderWebView, &QWebEngineView::loadFinished, this,
+              &MainWindow::enaGeInput);
+    }
+
+    webView->setUrl(QUrl(url.replace("{word}", word)));
   }
 }
 
@@ -627,6 +648,20 @@ void MainWindow::onPrevLanguage()
   }
 
   languages.last()->trigger();
+}
+
+void MainWindow::enaGeInput(bool ok)
+{
+  if (ok)
+  {
+    senderWebView->page()->runJavaScript(
+          "document.getElementById('word_metauri').value='" + searchWord + "'",
+          [](const QVariant &v) {
+      Q_UNUSED(v)
+      senderWebView->page()->runJavaScript(
+            "document.getElementById('submit').click()");
+    });
+  }
 }
 
 void WordCount::run()
