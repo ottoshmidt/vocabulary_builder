@@ -6,10 +6,6 @@
 #include <QScrollBar>
 #include <QStatusBar>
 
-//TODO: BUG: Enter a misspelled word, then correct it but that correct word is
-//      already contained in the dict. Action?
-//TODO: BUG: when sorted by name and add new word, problems with appearing that word.
-
 //TODO: Dark theme
 //TODO: Reflect website modifications in settings in already loaded programme
 //TODO: Ability to save database in another location (Share drive, Dropbox, etc.).
@@ -512,6 +508,25 @@ void MainWindow::onBeforeUpdate(int row, QSqlRecord &record)
 
   record.setValue("updatetime", dateTime);
   record.setGenerated("updatetime", true);
+
+  auto word = record.value("word").toString();
+
+  // Check if already exists
+  QSqlQuery query(DataBase::getDb());
+
+  query.prepare("select word from words where word = ?");
+  query.addBindValue(word);
+
+  if(!query.exec())
+    QMessageBox::critical(nullptr, tr("Database Error while checking word "
+                                      "duplication"), query.lastError().text());
+
+  while(query.next())
+  {
+    currentModel->setData(currentModel->index(row, 1),
+                          word + " ");
+    currentModel->setData(currentModel->index(row, 2), "Exists!!!");
+  }
 
   threadWordCount->start();
 }
