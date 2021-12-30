@@ -263,7 +263,7 @@ void MainWindow::setupMenus()
   menuWords.addSeparator();
 
   actionDeleteRecord.setText(tr("&Delete Record"));
-  actionDeleteRecord.setShortcut(QKeySequence::Delete);
+  actionDeleteRecord.setShortcut(Qt::CTRL + Qt::Key_Delete);
   actionDeleteRecord.setIcon(QIcon(":/icons/delete.ico"));
   actionDeleteRecord.setEnabled(false);
   connect(&actionDeleteRecord, &QAction::triggered, this,
