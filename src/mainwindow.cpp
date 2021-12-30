@@ -608,6 +608,8 @@ void MainWindow::actionLanguage(const QAction *action)
     threadWordCount->start();
 
     currentLanguage = const_cast<QAction*>(action);
+
+    clearBrowsers();
   }
 }
 
