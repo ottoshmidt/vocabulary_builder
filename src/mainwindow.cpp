@@ -117,10 +117,16 @@ void MainWindow::setupCentralGrid()
   connect(&actionNextTab, &QAction::triggered, this, &MainWindow::onChangeTabKey);
   actionPrevTab.setShortcut(Qt::CTRL + Qt::Key_PageUp);
   connect(&actionPrevTab, &QAction::triggered, this, &MainWindow::onChangeTabKey);
-  actionNextLanguage.setShortcut(Qt::CTRL + Qt::Key_L);
+  QList<QKeySequence> langKeys;
+  langKeys.append(Qt::CTRL + Qt::Key_Period);
+  langKeys.append(Qt::CTRL + Qt::Key_Greater);
+  actionNextLanguage.setShortcuts(langKeys);
   connect(&actionNextLanguage, &QAction::triggered, this,
           &MainWindow::onNextLanguage);
-  actionPrevLanguage.setShortcut(Qt::CTRL + Qt::SHIFT + Qt::Key_L);
+  langKeys.clear();
+  langKeys.append(Qt::CTRL + Qt::Key_Comma);
+  langKeys.append(Qt::CTRL + Qt::Key_Less);
+  actionPrevLanguage.setShortcuts(langKeys);
   connect(&actionPrevLanguage, &QAction::triggered, this,
           &MainWindow::onPrevLanguage);
   addAction(&actionNextTab);
