@@ -137,6 +137,7 @@ private slots:
   void onNextLanguage();
   void onPrevLanguage();
   void enaGeInput(bool ok);
+  void translateGeInput(bool ok);
 };
 
 #endif // MAINWINDOW_H

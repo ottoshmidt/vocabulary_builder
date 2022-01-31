@@ -23,8 +23,11 @@
 bool showStatusBar;
 bool confirmDelete;
 
-QWebEngineView *senderWebView = nullptr;
+QWebEngineView *enaGeView = nullptr;
+QWebEngineView *translateGeView = nullptr;
 QString searchWord = "";
+QUrl translateGeUrl;
+bool translateGeLoaded = false;
 
 MainWindow::MainWindow(QWidget *parent) :
   QMainWindow(parent)
@@ -319,12 +322,15 @@ void MainWindow::addWebViews()
 
 void MainWindow::webSearchWord(const QString &word)
 {
-  if (senderWebView)
-  {
-    disconnect(senderWebView, &QWebEngineView::loadFinished, this,
+  searchWord = "";
+  translateGeUrl.clear();
+
+  if (enaGeView)
+    disconnect(enaGeView, &QWebEngineView::loadFinished, this,
                &MainWindow::enaGeInput);
-    searchWord = "";
-  }
+  if (translateGeView)
+    disconnect(translateGeView, &QWebEngineView::loadFinished, this,
+               &MainWindow::translateGeInput);
 
   QString url;
   for(int i = 0; i < urls.size(); i++)
@@ -333,20 +339,69 @@ void MainWindow::webSearchWord(const QString &word)
 
     auto webView = webViewList.at(i);
 
-    if (url.contains("ena.ge"))
+    searchWord = word;
+    if(url.contains("ena.ge"))
     {
-      senderWebView = webView;
-      searchWord = word;
-      connect(senderWebView, &QWebEngineView::loadFinished, this,
-              &MainWindow::enaGeInput);
+      enaGeView = webView;
+
+        connect(enaGeView, &QWebEngineView::loadFinished, this,
+                &MainWindow::enaGeInput);
+    }
+    else if(url.contains("translate.ge"))
+    {
+      translateGeView = webView;
+
+      connect(translateGeView, &QWebEngineView::loadFinished, this,
+              &MainWindow::translateGeInput);
+
+      webView->setUrl(QUrl(""));
+      translateGeUrl = QUrl(url.replace("{word}", word));
     }
 
-    webView->setUrl(QUrl(url.replace("{word}", word)));
+    if (!url.contains("translate.ge") || !translateGeLoaded)
+      webView->setUrl(QUrl(url.replace("{word}", word)));
+  }
+}
+
+void MainWindow::enaGeInput(bool ok)
+{
+  if (ok)
+  {
+    enaGeView->page()->runJavaScript(
+          "document.getElementById('word_metauri').value='" + searchWord + "'",
+          [](const QVariant &v) {
+      Q_UNUSED(v)
+      enaGeView->page()->runJavaScript(
+            "document.getElementById('submit').click()");
+    });
+  }
+}
+
+void MainWindow::translateGeInput(bool ok)
+{
+  if (ok)
+  {
+    if (translateGeView->url().toString().contains("blank") &&
+        !translateGeUrl.isEmpty())
+    {
+      translateGeView->setUrl(translateGeUrl);
+    }
+    else
+    {
+      translateGeView->page()->runJavaScript(
+            "document.getElementById('query_box').value='" + searchWord + "'",
+            [](const QVariant &v) {
+        Q_UNUSED(v)
+        translateGeLoaded = true;
+      });
+    }
   }
 }
 
 void MainWindow::clearBrowsers()
 {
+  translateGeUrl.clear();
+
   for(int i = 0; i < urls.size(); i++)
     webViewList.at(i)->setUrl(QUrl(""));
 }
@@ -650,20 +705,6 @@ void MainWindow::onPrevLanguage()
   }
 
   languages.last()->trigger();
-}
-
-void MainWindow::enaGeInput(bool ok)
-{
-  if (ok)
-  {
-    senderWebView->page()->runJavaScript(
-          "document.getElementById('word_metauri').value='" + searchWord + "'",
-          [](const QVariant &v) {
-      Q_UNUSED(v)
-      senderWebView->page()->runJavaScript(
-            "document.getElementById('submit').click()");
-    });
-  }
 }
 
 void WordCount::run()
