@@ -59,7 +59,7 @@ void ModelView::setupView()
 
   tableWords->setModel(modelWords);
   tableWords->setSortingEnabled(true);
-  tableWords->sortByColumn(9, Qt::DescendingOrder);
+  tableWords->sortByColumn(8, Qt::DescendingOrder);
   tableWords->hideColumn(7);
 
   cbDelegate = new CheckBoxDelegate(tableWords);
