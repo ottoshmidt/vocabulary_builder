@@ -20,7 +20,6 @@ DialogAddWord::DialogAddWord(QWidget *parent)
 
   gridLayout.addWidget(&leWord, 0, 0, 1, 3);
   gridLayout.addWidget(&lbResult, 1, 0, 1, 2);
-  gridLayout.addWidget(&lbGoToWord, 1, 2);
   gridLayout.addWidget(&pbAddWord, 3, 1);
   gridLayout.addWidget(&pbClose, 3, 2);
   gridLayout.setRowStretch(2, 1);
@@ -31,17 +30,13 @@ DialogAddWord::DialogAddWord(QWidget *parent)
 
   connect(&pbClose, &QPushButton::released, this, &QWidget::close);
   connect(&pbAddWord, &QPushButton::released, this, &DialogAddWord::addWord);
-  connect(&lbGoToWord, &QLabel::linkActivated, this, &DialogAddWord::gotoWord);
 }
 
 void DialogAddWord::hideEvent(QHideEvent *event)
 {
   leWord.clear();
   lbResult.clear();
-  lbGoToWord.clear();
-
   leWord.setFocus();
-
   event->accept();
 }
 
@@ -94,8 +89,6 @@ void DialogAddWord::addWord()
       lbResult.setText("Word '" + word + "' exists! (" + defined + ") Rating: " +
                        QString::number(rating));
 
-      lbGoToWord.setText("<a href=\""+ word +"\">Go to word</a>");
-
       emit wordUpdated();
     }
     else
@@ -119,8 +112,6 @@ void DialogAddWord::addWord()
     if(query.exec())
     {
       lbResult.setText("Word '" + word + "' added. Rating: 1");
-
-      lbGoToWord.clear();
 
       emit wordInserted();
     }

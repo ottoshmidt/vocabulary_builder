@@ -20,7 +20,6 @@ public:
 private:
   QLineEdit leWord;
   QLabel lbResult;
-  QLabel lbGoToWord;
   QGridLayout gridLayout;
   QPushButton pbAddWord;
   QPushButton pbClose;
