@@ -26,8 +26,6 @@ bool confirmDelete;
 QWebEngineView *enaGeView = nullptr;
 QWebEngineView *translateGeView = nullptr;
 QString searchWord = "";
-QUrl translateGeUrl;
-bool translateGeLoaded = false;
 
 MainWindow::MainWindow(QWidget *parent) :
   QMainWindow(parent)
@@ -156,11 +154,11 @@ void MainWindow::setupMenus()
   actionsLanguages = new QActionGroup(languageMenu);
   QSqlQuery query(DataBase::getDb());
 
-  if(!query.exec("select id, language from languages"))
+  if (!query.exec("select id, language from languages"))
     QMessageBox::critical(nullptr, tr("Database Error when getting languages"),
                           query.lastError().text());
 
-  while(query.next())
+  while (query.next())
   {
     languages.append(new QAction(query.value(1).toString(), actionsLanguages));
 
@@ -286,16 +284,16 @@ void MainWindow::updateUrls()
                 "order by id");
   query.addBindValue(DataBase::getSetting("current_language"));
 
-  if(!query.exec())
+  if (!query.exec())
     QMessageBox::critical(nullptr, "Database Error", query.lastError().text());
 
-  while(query.next())
+  while (query.next())
     urls.append(query.value(0).toString());
 }
 
 void MainWindow::addWebViews()
 {
-  for(int i = 0; i < urls.count() - currentWebViews; i++)
+  for (int i = 0; i < urls.count() - currentWebViews; i++)
   {
     auto *webView = new QWebEngineView(&centreWidget);
 
@@ -305,7 +303,7 @@ void MainWindow::addWebViews()
 
     webViewList.append(webView);
 
-    if(col == 0)
+    if (col == 0)
     {
       col = 1;
     }
@@ -323,7 +321,6 @@ void MainWindow::addWebViews()
 void MainWindow::webSearchWord(const QString &word)
 {
   searchWord = "";
-  translateGeUrl.clear();
 
   if (enaGeView)
     disconnect(enaGeView, &QWebEngineView::loadFinished, this,
@@ -333,19 +330,19 @@ void MainWindow::webSearchWord(const QString &word)
                &MainWindow::translateGeInput);
 
   QString url;
-  for(int i = 0; i < urls.size(); i++)
+  for (int i = 0; i < urls.size(); i++)
   {
     url = urls[i];
 
     auto webView = webViewList.at(i);
 
     searchWord = word;
-    if(url.contains("ena.ge"))
+    if (url.contains("ena.ge"))
     {
       enaGeView = webView;
 
-        connect(enaGeView, &QWebEngineView::loadFinished, this,
-                &MainWindow::enaGeInput);
+      connect(enaGeView, &QWebEngineView::loadFinished, this,
+              &MainWindow::enaGeInput);
     }
     else if(url.contains("translate.ge"))
     {
@@ -353,13 +350,9 @@ void MainWindow::webSearchWord(const QString &word)
 
       connect(translateGeView, &QWebEngineView::loadFinished, this,
               &MainWindow::translateGeInput);
-
-      webView->setUrl(QUrl(""));
-      translateGeUrl = QUrl(url.replace("{word}", word));
     }
 
-    if (!url.contains("translate.ge") || !translateGeLoaded)
-      webView->setUrl(QUrl(url.replace("{word}", word)));
+    webView->setUrl(QUrl(url.replace("{word}", word)));
   }
 }
 
@@ -381,27 +374,16 @@ void MainWindow::translateGeInput(bool ok)
 {
   if (ok)
   {
-    if (translateGeView->url().toString().contains("blank") &&
-        !translateGeUrl.isEmpty())
-    {
-      translateGeView->setUrl(translateGeUrl);
-    }
-    else
-    {
-      translateGeView->page()->runJavaScript(
-            "document.getElementById('query_box').value='" + searchWord + "'",
-            [](const QVariant &v) {
-        Q_UNUSED(v)
-        translateGeLoaded = true;
-      });
-    }
+    translateGeView->page()->runJavaScript(
+          "document.getElementById('query_box').value='" + searchWord + "'",
+          [](const QVariant &v) {
+      Q_UNUSED(v)
+    });
   }
 }
 
 void MainWindow::clearBrowsers()
 {
-  translateGeUrl.clear();
-
   for(int i = 0; i < urls.size(); i++)
     webViewList.at(i)->setUrl(QUrl(""));
 }
@@ -539,7 +521,7 @@ void MainWindow::applyFilter()
   if (!filterStr.isEmpty())
     filterStr += " and ";
   filterStr += "language_fk = " + QString::number(
-                  DataBase::getSetting("current_language"));
+                 DataBase::getSetting("current_language"));
 
   modelWords->setFilter(filterStr);
 }
