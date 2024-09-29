@@ -298,6 +298,8 @@ void MainWindow::addWebViews()
     auto *webView = new QWebEngineView(&centreWidget);
 
     webView->setMinimumHeight(550);
+    webView->page()->setBackgroundColor(QColor(0x41, 0x41, 0x41));
+    webView->hide();
 
     glCentralGrid.addWidget(webView, row, col);
 
@@ -353,6 +355,7 @@ void MainWindow::webSearchWord(const QString &word)
     }
 
     webView->setUrl(QUrl(url.replace("{word}", word)));
+    webView->show();
   }
 }
 
@@ -384,8 +387,16 @@ void MainWindow::translateGeInput(bool ok)
 
 void MainWindow::clearBrowsers()
 {
-  for(int i = 0; i < urls.size(); i++)
-    webViewList.at(i)->setUrl(QUrl(""));
+  for(int i = 0; i < currentWebViews; i++)
+    webViewList.at(i)->deleteLater();
+
+  currentWebViews = 0;
+  webViewList.clear();
+
+  enaGeView = nullptr;
+  translateGeView = nullptr;
+
+  addWebViews();
 }
 
 void MainWindow::resizeEvent(QResizeEvent *event)

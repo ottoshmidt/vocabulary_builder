@@ -8,6 +8,8 @@ QT       += core gui sql webenginewidgets
 
 greaterThan(QT_MAJOR_VERSION, 4): QT += widgets
 
+# QMAKE_CXXFLAGS += -g
+
 TARGET = Vocabulary_Builder
 TEMPLATE = app
 
