@@ -6,7 +6,7 @@
 #include <QScrollBar>
 #include <QStatusBar>
 
-//TODO: Dark theme
+//TODO: Settings dialog needs widget size adjustments
 //TODO: Reflect website modifications in settings in already loaded programme
 //TODO: Ability to save database in another location (Share drive, Dropbox, etc.).
 //      Would need to save settings in .config dir
