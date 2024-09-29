@@ -297,9 +297,10 @@ void MainWindow::addWebViews()
   {
     auto *webView = new QWebEngineView(&centreWidget);
 
-    webView->setMinimumHeight(550);
+    webView->setMinimumHeight(1250);
     webView->page()->setBackgroundColor(QColor(0x41, 0x41, 0x41));
     webView->hide();
+    webView->setZoomFactor(2.5);
 
     glCentralGrid.addWidget(webView, row, col);
 
